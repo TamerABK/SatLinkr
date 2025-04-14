@@ -1,0 +1,11 @@
+SatelliteApp.spec
+cacert.pem
+*.cfg
+*.txt
+Parismap.html
+build/SatelliteApp/Analysis-00.toc
+/build/
+/dist/
+test.py
+/data/
+__pycache__

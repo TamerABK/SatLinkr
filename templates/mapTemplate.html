@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite Map with Atmospheric Data</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mapStyling.css') }}" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+
+</head>
+<body>
+    
+
+    <div class="container">
+
+        
+        {% with messages = get_flashed_messages()%}
+        {% if messages%}
+            {% for message in messages%}
+            <div id="flash-message" >
+                {{ messages[-1] }}
+            </div>
+            {%endfor%}
+        {%endif%}
+        {%endwith%}
+
+
+        <!-- Map Section -->
+        <div id="map" class="map-container">
+            {{ map_html|safe }}
+
+            
+        </div>
+
+        <!-- Sidebar Form Section -->
+        <div class="sidebar">
+            <h1>Atmospheric Data Controls</h1>
+            <form method="POST">
+
+                <label for="satellite">Select Satellite</label>
+                <select name="satellite" id="satellite">
+                    <option value="OCO2" {% if satellite == "OCO2" %}selected{% endif %}>OCO 2</option>
+                    <option value="GOSAT" {% if satellite == "GOSAT" %}selected{% endif %}>GOSAT</option>
+                </select>
+
+                <label for="gas">Select a Gas:</label>
+                <select name="gas" id="gas">
+                    <option value="CO2" {% if selected_gas == "CO2" %}selected{% endif %}>CO2</option>
+                    <option value="CH4" {% if selected_gas == "CH4" %}selected{% endif %}>CH4</option>
+                    <option value="CO" {% if selected_gas == "CO" %}selected{% endif %}>CO</option>
+                    <option value="NO2" {% if selected_gas == "NO2" %}selected{% endif %}>NO2</option>
+                    <option value="H2O" {% if selected_gas == "H2O" %}selected{% endif %}>H2O</option>
+                </select>
+                
+                <div id="band-container" style="display:none;">
+                    <label for="band">Select Band:</label>
+                    <select name="band" id="band">
+                        <option value="1590" {% if selected_band == "1590" %}selected{% endif %}>1590</option>
+                        <!-- Band options will be dynamically updated based on the gas selected -->
+                    </select>
+                </div>
+
+                <label for="latitude">Latitude:</label>
+                <input type="number" step="any" id="latitude" name="latitude" value="{{ latitude }}" required><br>
+
+                <label for="longitude">Longitude:</label>
+                <input type="number" step="any" id="longitude" name="longitude" value="{{ longitude }}" required><br>
+
+                <label for="radius">Zone radius (km): <span id="radius-value">10</span> </label>
+                <input type="range" id="radius" name="radius" min="1" max="10000" value="{{ radius }}" oninput="updateRadiusValue()">
+
+                <label for="datetime">Date (dd/mm/yyyy hh:mm):</label>
+                <input type="datetime" name="datetime" id="datetime" value="{{ datetime }}" required><br>
+
+                <label for="delta_time">Delta times (minutes):</label>
+                <input type="number" id="delta_time" name="delta_time" value="{{ delta_time }}" required><br>
+
+                <label for="satellite_criteria">Satellite data selection criteria:</label>
+                <select id="satellite_criteria" name="satellite_criteria">
+                    <option value="flag" {% if satellite_criteria == "flag" %}selected{% endif %}>Flag</option>
+                    <option value="quality_factor" {% if satellite_criteria == "quality_factor" %}selected{% endif %}>Quality Factor</option>
+                </select><br>
+
+                <label for="ground_criteria">Ground data selection criteria:</label>
+                <label><input type="checkbox" id="ground_criteria" name="ground_criteria" value="flag" {% if ground_criteria == "flag" %}checked{% endif %}> Flag</label>
+
+                <button type="submit">Update Map</button>
+                <div id="selected_gas" data-value="{{ selected_gas }}"></div>
+                <div id="selected_band" data-value="{{ selected_band }}"></div>
+
+            </form>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='js/flashTimeout.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mapResize.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/gasOptions.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/radiusDisplay.js') }}"></script>
+</body>
+</html>

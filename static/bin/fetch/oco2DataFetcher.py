@@ -1,0 +1,59 @@
+import os
+import subprocess
+import configparser
+from datetime import datetime
+
+def read_wget_credentials(config_path="sftp_config.cfg"):
+    config = configparser.ConfigParser()
+    config.read(config_path)
+
+    return {
+        "username": config.get("OCO2", "username"), 
+        "password": config.get("OCO2", "password"),
+        "cookies": config.get("OCO2","cookies")
+    }
+
+def download_with_wget(url,output,creds,cacert):
+
+    try:
+        
+        subprocess.run(["wget",f"--ca-certificate={cacert}","--load-cookies",creds['cookies'], "--save-cookies",creds['cookies'],"--user", creds["username"], "--password", creds["password"], url, "-O", output], check=True)
+    except Exception as e:
+        print(f"Error downloading file: {e}")
+        return ""
+    
+def matchURl(targetDate:datetime,linksFile="OCO2links.txt"):
+    target=f"{str(targetDate.year)[-2:]}{targetDate.month:02d}{targetDate.day:02d}"
+    with open(linksFile,'r') as f:
+        lines= f.readlines()
+        for line in lines:  
+            if line[93:99]==target:  
+                return line[:-1]
+    return None
+
+def handle_oco2_fetch(targetDate:datetime,basePath): 
+    linksFile = os.path.join(basePath,"OCO2links.txt")
+    url = matchURl( targetDate, linksFile ) 
+
+    if not url:
+        print("No link for files of this day")
+        return ""
+    
+    output = os.path.join(basePath,"data","OCO2",str(targetDate.year))
+    os.makedirs(output,exist_ok=True)
+    output=os.path.join(output,url.split('/')[-1])
+    config_path = os.path.join(basePath, "sftp_config.cfg")
+    creds=read_wget_credentials(config_path)
+
+    download_with_wget(url,output,creds,os.path.join(basePath,"cacert.pem"))
+    return output
+
+
+
+
+if __name__ == "__main__":
+    creds=read_wget_credentials()
+    url=matchURl(datetime(year=2022,month=4,day=11))
+    download_with_wget(url,f'./temp.nc4',creds)
+
+        
