@@ -10,7 +10,7 @@ from datetime import datetime
 #     lon1, lat1, lon2, lat2 = np.radians([lon1, lat1, lon2, lat2])
 
 #     # Differences in coordinates
-#     dlon = lon2 - lon1
+#     dlon = lon2 - lon1 
 #     dlat = lat2 - lat1
 
 #     # Haversine formula

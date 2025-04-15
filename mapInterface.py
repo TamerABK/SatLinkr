@@ -52,7 +52,7 @@ def choose_file(satellite,date:datetime):
                 return os.path.join(path,file)
         return ""
 
-def get_data(satellite,gas,band,lat,long,range,date,delta):
+def get_data(satellite,gas,band,lat,long,range,date,delta,satellite_criteria):
     
     file=choose_file(satellite,date)
     
@@ -69,7 +69,7 @@ def get_data(satellite,gas,band,lat,long,range,date,delta):
            file= handle_oco2_fetch(date,os.getcwd())
            if file == "":
                return [],False
-        return OCO2filter(file,gas,date,delta,lat,long,range),True
+        return OCO2filter(file,gas,date,delta,lat,long,range,satellite_criteria),True
          
 
 
@@ -115,7 +115,7 @@ def index():
         ground_criteria = request.form.get("ground_criteria") 
       
     # print(gas,sattelite,latitude,longitude,radius,date,delta_time)  
-    data,success=get_data(satellite,gas,band,latitude,longitude,radius,date,delta_time)
+    data,success=get_data(satellite,gas,band,latitude,longitude,radius,date,delta_time,satellite_criteria)
     if data == []: 
         if success: flash("No data found within those parameters")
         else: flash("No file found for this date locally or on the servers")
@@ -130,5 +130,5 @@ def index():
 if __name__ == '__main__':
     Timer(3, lambda: webbrowser.open("http://127.0.0.1:5000")).start()
     
-    socketio.run(app, debug=True)          
+    socketio.run(app, debug=True)           
       

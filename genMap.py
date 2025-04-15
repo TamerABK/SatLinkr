@@ -69,7 +69,6 @@ def generate_map(lat,long,radius,gas_data):
 
             scale+=f"<span>{tp}</span>"
             sc+=step
-        print(gas_data)
         # Adding a legend for the map
         legend_html = f"""
         <div style="
