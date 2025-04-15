@@ -99,3 +99,7 @@ button:hover {
     left: 30%;
     z-index: 1000;
 }
+
+#quality-container {
+    padding: 10px;
+}

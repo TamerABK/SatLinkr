@@ -75,13 +75,14 @@
 
                 <label for="delta_time">Delta times (minutes):</label>
                 <input type="number" id="delta_time" name="delta_time" value="{{ delta_time }}" required><br>
-
-                <label for="satellite_criteria">Satellite data selection criteria:</label>
-                <select id="satellite_criteria" name="satellite_criteria">
-                    <option value="flag" {% if satellite_criteria == "flag" %}selected{% endif %}>Flag</option>
-                    <option value="quality_factor" {% if satellite_criteria == "quality_factor" %}selected{% endif %}>Quality Factor</option>
-                </select><br>
-
+                
+                <div id="quality-container" style="display: block;">
+                    <label for="satellite_criteria">Satellite filter for quality:</label>
+                    <select id="satellite_criteria" name="satellite_criteria">
+                        <option value="True" {% if satellite_criteria == "True" %}selected{% endif %}>True</option>
+                        <option value="False" {% if satellite_criteria == "False" %}selected{% endif %}>False</option>
+                    </select><br>
+                </div>
                 <label for="ground_criteria">Ground data selection criteria:</label>
                 <label><input type="checkbox" id="ground_criteria" name="ground_criteria" value="flag" {% if ground_criteria == "flag" %}checked{% endif %}> Flag</label>
 

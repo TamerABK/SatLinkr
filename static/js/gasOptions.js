@@ -6,6 +6,14 @@ document.getElementById('satellite').addEventListener('change', function() {
     socket.emit('change_satellite', { 'satellite': satellite });
     updateGasOptions(satellite);
     hideBandOptions();
+
+    var flagContainer = document.getElementById('quality-container');
+    if (satellite == 'OCO2'){
+        flagContainer.style = "display:block";
+    } else{
+        flagContainer.style = "display:none";
+    }
+
 });
 
 // Listen for gas changes
