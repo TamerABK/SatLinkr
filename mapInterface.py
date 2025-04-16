@@ -1,12 +1,13 @@
 from threading import Timer
 from datetime import datetime
 import webbrowser
-import os
+from flask import Flask, render_template, request,flash
+import os, uuid
 import sys
 import numpy as np
-from flask import Flask, render_template, request,flash
 from flask_socketio import SocketIO, emit
 from genMap import generate_map
+from genPng import genPng
 from static.bin.fetch.gosatDataFetcher import *
 from static.bin.fetch.oco2DataFetcher import *
 from static.bin.filter.filterSWPR import *
@@ -15,7 +16,7 @@ sys.path.append(os.path.join(os.getcwd(),"static","bin","filter"))
 
 GASOPTION={
     "OCO2":["CO2"],
-    "GOSAT":["CO2","CH4","CO","NO2","H2O"]
+    "GOSAT":["CO2","CH4","CO","H2O"]
 }
 
 BANDOPTION={
@@ -87,6 +88,11 @@ def handle_change_gas(data):
     else: bands=[]
     emit('update_bands', {'bands': bands})
  
+
+@app.route('/render_map_png', methods=['POST'])
+def render_map_png():
+    return genPng()
+
 
 # Route for the main page
 @app.route('/', methods=['GET', 'POST'])

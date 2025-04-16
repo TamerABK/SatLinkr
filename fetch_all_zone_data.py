@@ -6,7 +6,7 @@ from static.bin.fetch.oco2DataFetcher import *
 from static.bin.filter.filterSWPR import *
 from static.bin.filter.filterOCO2 import *
 
-def collect(satellite,dateStart,dateEND,lat,long,radius):
+def collect(satellite,dateStart,dateEND,lat,long,radius): 
 
     basePath=os.getcwd()
     date=dateStart
@@ -34,5 +34,5 @@ if __name__=="__main__":
         "GOSAT",
         datetime(year=2024,month=1,day=1),datetime(year=2024,month=12,day=31),
         48.8566,2.3522,
-        300
+        300 
     )

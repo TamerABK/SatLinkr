@@ -11,6 +11,7 @@
 </head>
 <body>
     
+    <div id="loader"></div>
 
     <div class="container">
 
@@ -49,7 +50,7 @@
                     <option value="CO2" {% if selected_gas == "CO2" %}selected{% endif %}>CO2</option>
                     <option value="CH4" {% if selected_gas == "CH4" %}selected{% endif %}>CH4</option>
                     <option value="CO" {% if selected_gas == "CO" %}selected{% endif %}>CO</option>
-                    <option value="NO2" {% if selected_gas == "NO2" %}selected{% endif %}>NO2</option>
+                    <!-- <option value="NO2" {% if selected_gas == "NO2" %}selected{% endif %}>NO2</option> -->
                     <option value="H2O" {% if selected_gas == "H2O" %}selected{% endif %}>H2O</option>
                 </select>
                 
@@ -91,6 +92,7 @@
                 <div id="selected_band" data-value="{{ selected_band }}"></div>
 
             </form>
+             <button onclick="sendMapHTML()">Donwload Map </button>
         </div>
     </div>
 
@@ -99,5 +101,6 @@
     <script src="{{ url_for('static', filename='js/mapResize.js') }}"></script>
     <script src="{{ url_for('static', filename='js/gasOptions.js') }}"></script>
     <script src="{{ url_for('static', filename='js/radiusDisplay.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mapFetch.js') }}"></script>
 </body>
 </html>

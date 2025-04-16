@@ -1,0 +1,81 @@
+{
+ "version": "auto-py-to-exe-configuration_v1",
+ "pyinstallerOptions": [
+  {
+   "optionDest": "noconfirm",
+   "value": true
+  },
+  {
+   "optionDest": "filenames",
+   "value": "D:/Etudiant 5/Bureau/TAMER/satelliteImageryApp/mapInterface.py"
+  },
+  {
+   "optionDest": "onefile",
+   "value": true
+  },
+  {
+   "optionDest": "console",
+   "value": true
+  },
+  {
+   "optionDest": "clean_build",
+   "value": false
+  },
+  {
+   "optionDest": "optimize",
+   "value": "2"
+  },
+  {
+   "optionDest": "strip",
+   "value": false
+  },
+  {
+   "optionDest": "noupx",
+   "value": false
+  },
+  {
+   "optionDest": "disable_windowed_traceback",
+   "value": false
+  },
+  {
+   "optionDest": "uac_admin",
+   "value": false
+  },
+  {
+   "optionDest": "uac_uiaccess",
+   "value": false
+  },
+  {
+   "optionDest": "argv_emulation",
+   "value": false
+  },
+  {
+   "optionDest": "bootloader_ignore_signals",
+   "value": false
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Etudiant 5/Bureau/TAMER/satelliteImageryApp/static;static/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Etudiant 5/Bureau/TAMER/satelliteImageryApp/templates;templates/"
+  },
+  {
+   "optionDest": "hiddenimports",
+   "value": "socketio.async_drivers.threading"
+  },
+  {
+   "optionDest": "hiddenimports",
+   "value": "engineio.async_drivers.threading"
+  },
+  {
+   "optionDest": "datas",
+   "value": "D:/Etudiant 5/Bureau/TAMER/satelliteImageryApp/tmp;tmp/"
+  }
+ ],
+ "nonPyinstallerOptions": {
+  "increaseRecursionLimit": true,
+  "manualArguments": ""
+ }
+}
