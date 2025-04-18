@@ -1,7 +1,7 @@
 from threading import Timer
 from datetime import datetime
 import webbrowser
-from flask import Flask, render_template, request,flash
+from flask import Flask, jsonify, render_template, request,flash
 import os, uuid
 import sys
 import numpy as np
@@ -93,9 +93,32 @@ def handle_change_gas(data):
 def render_map_png():
     return genPng()
 
+@app.route('/update_map', methods=['POST'])
+def update_map():
+    gas = request.form.get("gas")
+    band = request.form.get("band")
+    satellite = request.form.get("satellite")
+    latitude = np.float64(request.form.get("latitude"))
+    longitude = np.float64(request.form.get("longitude"))
+    radius = int(request.form.get("radius"))
+    date = datetime.strptime(request.form.get("datetime"), "%d/%m/%Y %H:%M")
+    delta_time = int(request.form.get("delta_time"))
+    satellite_criteria = request.form.get("satellite_criteria")
+    ground_criteria = request.form.get("ground_criteria")
+
+    data, success = get_data(satellite, gas, band, latitude, longitude, radius, date, delta_time, satellite_criteria)
+
+    if data == []:
+        if success:
+            return jsonify({'error': "No data found within those parameters"})
+        else:
+            return jsonify({'error': "No file found for this date locally or on the servers"})
+
+    map_html = generate_map(latitude, longitude, radius, data)
+    return jsonify({'map_html': map_html})
 
 # Route for the main page
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def index():
     gas = "CO2"
     satellite = "OCO2" 
@@ -108,23 +131,9 @@ def index():
     satellite_criteria = "Flag"
     ground_criteria = "Flag" 
 
-    if request.method == "POST":
-        gas = request.form.get("gas") 
-        band= request.form.get("band")
-        satellite = request.form.get("satellite")
-        latitude = np.float64( request.form.get("latitude"))
-        longitude = np.float64( request.form.get("longitude"))
-        radius = int(request.form.get("radius"))
-        date= datetime.strptime(request.form.get("datetime"),"%d/%m/%Y %H:%M")
-        delta_time = int(request.form.get("delta_time"))
-        satellite_criteria = request.form.get("satellite_criteria")
-        ground_criteria = request.form.get("ground_criteria") 
       
     # print(gas,sattelite,latitude,longitude,radius,date,delta_time)  
     data,success=get_data(satellite,gas,band,latitude,longitude,radius,date,delta_time,satellite_criteria)
-    if data == []: 
-        if success: flash("No data found within those parameters")
-        else: flash("No file found for this date locally or on the servers")
     
     map_html = generate_map(latitude,longitude,radius,data)
     return render_template('mapTemplate.html', map_html=map_html, selected_gas=gas, selected_band=band, 

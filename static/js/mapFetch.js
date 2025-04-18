@@ -12,7 +12,6 @@ function attachMapListener() {
         return;
     }
 
-    iframe.addEventListener("load", () => {
         try {
             const iframeWindow = iframe.contentWindow;
 
@@ -41,8 +40,7 @@ function attachMapListener() {
             }, 200);
         } catch (e) {
             console.error("Error accessing map in iframe:", e);
-        }
-    });
+        };
 }
 
 attachMapListener();

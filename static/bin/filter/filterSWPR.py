@@ -38,7 +38,10 @@ def SWPRfilter(file,gas,band,date:datetime,delta,lat,long,range):
         lats=fs["SoundingGeometry/latitude"]
         longs=fs["SoundingGeometry/longitude"]
         for lat2, long2 in zip(lats, longs):
+            if lat2 is None or long2 is None:
+                print(lat2,long2)
             distances.append(distances.append(haversine((lat,long),(lat2,long2),unit=Unit.KILOMETERS)) ) 
+        
         index=filterIndex(distances,index,None,range) 
 
         return [ [lats[i],longs[i],fs[RETRIVALPATH[gas][band]][i]] for i in index if fs[RETRIVALPATH[gas][band]][i]>=0.0]

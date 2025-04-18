@@ -13,6 +13,8 @@ def generate_map(lat,long,radius,gas_data):
     m = folium.Map(
         location=[lat, long],
         zoom_start=12,
+        min_zoom=4,
+        max_zoom=18,
         tiles="CartoDB dark_matter",  
         control_scale=True,      
     )

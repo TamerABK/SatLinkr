@@ -36,63 +36,92 @@
 
         <!-- Sidebar Form Section -->
         <div class="sidebar">
-            <h1>Atmospheric Data Controls</h1>
-            <form method="POST">
+            
+            <div class="sidebar-toggle">
+                <button id="toggle1" class="toggle-btn active" onclick="showSidebar(1)">Map Params</button>
+                <button id="toggle2" class="toggle-btn" onclick="showSidebar(2)">Fetch Data</button>
+            </div>
+            
+            <div id="mapBar">
+                <h1>Atmospheric Data Controls</h1>
+                <form id="mapParams" method="POST">
 
-                <label for="satellite">Select Satellite</label>
-                <select name="satellite" id="satellite">
-                    <option value="OCO2" {% if satellite == "OCO2" %}selected{% endif %}>OCO 2</option>
-                    <option value="GOSAT" {% if satellite == "GOSAT" %}selected{% endif %}>GOSAT</option>
-                </select>
-
-                <label for="gas">Select a Gas:</label>
-                <select name="gas" id="gas">
-                    <option value="CO2" {% if selected_gas == "CO2" %}selected{% endif %}>CO2</option>
-                    <option value="CH4" {% if selected_gas == "CH4" %}selected{% endif %}>CH4</option>
-                    <option value="CO" {% if selected_gas == "CO" %}selected{% endif %}>CO</option>
-                    <!-- <option value="NO2" {% if selected_gas == "NO2" %}selected{% endif %}>NO2</option> -->
-                    <option value="H2O" {% if selected_gas == "H2O" %}selected{% endif %}>H2O</option>
-                </select>
-                
-                <div id="band-container" style="display:none;">
-                    <label for="band">Select Band:</label>
-                    <select name="band" id="band">
-                        <option value="1590" {% if selected_band == "1590" %}selected{% endif %}>1590</option>
-                        <!-- Band options will be dynamically updated based on the gas selected -->
+                    <label for="satellite">Select Satellite</label>
+                    <select name="satellite" id="satellite">
+                        <option value="OCO2" {% if satellite == "OCO2" %}selected{% endif %}>OCO 2</option>
+                        <option value="GOSAT" {% if satellite == "GOSAT" %}selected{% endif %}>GOSAT</option>
                     </select>
-                </div>
 
-                <label for="latitude">Latitude:</label>
-                <input type="number" step="any" id="latitude" name="latitude" value="{{ latitude }}" required><br>
+                    <label for="gas">Select a Gas:</label>
+                    <select name="gas" id="gas">
+                        <option value="CO2" {% if selected_gas == "CO2" %}selected{% endif %}>CO2</option>
+                        <option value="CH4" {% if selected_gas == "CH4" %}selected{% endif %}>CH4</option>
+                        <option value="CO" {% if selected_gas == "CO" %}selected{% endif %}>CO</option>
+                        <!-- <option value="NO2" {% if selected_gas == "NO2" %}selected{% endif %}>NO2</option> -->
+                        <option value="H2O" {% if selected_gas == "H2O" %}selected{% endif %}>H2O</option>
+                    </select>
+                    
+                    <div id="band-container" style="display:none;">
+                        <label for="band">Select Band:</label>
+                        <select name="band" id="band">
+                            <option value="1590" {% if selected_band == "1590" %}selected{% endif %}>1590</option>
+                            <!-- Band options will be dynamically updated based on the gas selected -->
+                        </select>
+                    </div>
 
-                <label for="longitude">Longitude:</label>
-                <input type="number" step="any" id="longitude" name="longitude" value="{{ longitude }}" required><br>
+                    <label for="latitude">Latitude:</label>
+                    <input type="number" step="any" id="latitude" name="latitude" value="{{ latitude }}" required><br>
 
-                <label for="radius">Zone radius (km): <span id="radius-value">10</span> </label>
-                <input type="range" id="radius" name="radius" min="1" max="10000" value="{{ radius }}" oninput="updateRadiusValue()">
+                    <label for="longitude">Longitude:</label>
+                    <input type="number" step="any" id="longitude" name="longitude" value="{{ longitude }}" required><br>
 
-                <label for="datetime">Date (dd/mm/yyyy hh:mm):</label>
-                <input type="datetime" name="datetime" id="datetime" value="{{ datetime }}" required><br>
+                    <label for="radius">Zone radius (km): <span id="radius-value">10</span> </label>
+                    <input type="range" id="radius" name="radius" min="1" max="10000" value="{{ radius }}" oninput="updateRadiusValue()">
 
-                <label for="delta_time">Delta times (minutes):</label>
-                <input type="number" id="delta_time" name="delta_time" value="{{ delta_time }}" required><br>
-                
-                <div id="quality-container" style="display: block;">
-                    <label for="satellite_criteria">Satellite filter for quality:</label>
-                    <select id="satellite_criteria" name="satellite_criteria">
-                        <option value="True" {% if satellite_criteria == "True" %}selected{% endif %}>True</option>
-                        <option value="False" {% if satellite_criteria == "False" %}selected{% endif %}>False</option>
-                    </select><br>
-                </div>
-                <label for="ground_criteria">Ground data selection criteria:</label>
-                <label><input type="checkbox" id="ground_criteria" name="ground_criteria" value="flag" {% if ground_criteria == "flag" %}checked{% endif %}> Flag</label>
+                    <label for="datetime">Date (dd/mm/yyyy hh:mm):</label>
+                    <input type="datetime" name="datetime" id="datetime" value="{{ datetime }}" required><br>
 
-                <button type="submit">Update Map</button>
-                <div id="selected_gas" data-value="{{ selected_gas }}"></div>
-                <div id="selected_band" data-value="{{ selected_band }}"></div>
+                    <label for="delta_time">Delta times (minutes):</label>
+                    <input type="number" id="delta_time" name="delta_time" value="{{ delta_time }}" required><br>
+                    
+                    <div id="quality-container" style="display: block;">
+                        <label for="satellite_criteria">Satellite filter for quality:</label>
+                        <select id="satellite_criteria" name="satellite_criteria">
+                            <option value="True" {% if satellite_criteria == "True" %}selected{% endif %}>True</option>
+                            <option value="False" {% if satellite_criteria == "False" %}selected{% endif %}>False</option>
+                        </select><br>
+                    </div>
+                    <label for="ground_criteria">Ground data selection criteria:</label>
+                    <label><input type="checkbox" id="ground_criteria" name="ground_criteria" value="flag" {% if ground_criteria == "flag" %}checked{% endif %}> Flag</label>
 
-            </form>
-             <button onclick="sendMapHTML()">Donwload Map </button>
+                    <button type="submit">Update Map</button>
+                    <div id="selected_gas" data-value="{{ selected_gas }}"></div>
+                    <div id="selected_band" data-value="{{ selected_band }}"></div>
+                    <button type="button" onclick="sendMapHTML()">Donwload Map </button>
+                </form>
+            </div>
+
+
+            <div id="fetchBar" style="display: none;">
+                <h1>Fetching data </h1>
+                <form id="customParams" method="POST">
+                    <label for="latitude2">Latitude:</label>
+                    <input type="number" step="any" id="latitude2" name="latitude2" required><br>
+            
+                    <label for="longitude2">Longitude:</label>
+                    <input type="number" step="any" id="longitude2" name="longitude2" required><br>
+            
+                    <label for="customRange">Select Range (km): <span id="custom-range-value">10</span></label>
+                    <input type="range" id="customRange" name="customRange" min="1" max="10000" value="10" oninput="document.getElementById('custom-range-value').textContent = this.value;"><br>
+            
+                    <label for="year">Year:</label>
+                    <input type="number" id="year" name="year" min="2000" max="2030" value="2024"><br>
+            
+                    <button type="submit">Search</button>
+                    <button type="reset">Reset</button>
+                </form>
+            </div>
+
         </div>
     </div>
 
@@ -102,5 +131,7 @@
     <script src="{{ url_for('static', filename='js/gasOptions.js') }}"></script>
     <script src="{{ url_for('static', filename='js/radiusDisplay.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mapFetch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mapUpdate.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sidebarControl.js') }}"></script>
 </body>
 </html>

@@ -63,11 +63,11 @@ form {
 }
 
 label {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 select, input[type="checkbox"] {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 button {
@@ -75,9 +75,10 @@ button {
     background-color: #007bff;
     color: white;
     border: none;
+    border-bottom: 3px solid #0056b3;
     cursor: pointer;
     border-radius: 5px;
-    margin: 10px;
+    margin: 5px;
 }
 
 button:hover {
@@ -129,4 +130,37 @@ button:hover {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+#fetchBar{
+    margin-top: 8%;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;  
+}
+
+.sidebar-toggle {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 10px;
+    background-color: #e0e0e0;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.toggle-btn.active {
+    background-color: #007BFF;
+    color: white;
+    border-bottom: 3px solid #0056b3;
+}
+
+.toggle-btn:not(.active):hover {
+    background-color: #d0d0d0;
 }
