@@ -82,7 +82,7 @@ def handle_gosat_fetch(type:str,targetDate:datetime,basePath):
     
     
     # Define the SFTP config file name
-    config_file_path = os.path.join(basePath, "sftp_config.cfg")
+    config_file_path = os.path.join(basePath, "auth_config.cfg")
     creds=read_sftp_credentials(config_file_path)
     local_path=os.path.join(basePath,"data","GOSAT",type)
     path=data_paths[type]
@@ -98,6 +98,7 @@ def handle_gosat_fetch(type:str,targetDate:datetime,basePath):
     if (filename==None): 
         return ""
 
+    os.makedirs(local_path,exist_ok=True)
     return download_file(f'{path}/{filename}',os.path.join(local_path,filename),creds)
     
 

@@ -42,9 +42,8 @@ def handle_oco2_fetch(targetDate:datetime,basePath):
     output = os.path.join(basePath,"data","OCO2",str(targetDate.year))
     os.makedirs(output,exist_ok=True)
     output=os.path.join(output,url.split('/')[-1])
-    config_path = os.path.join(basePath, "sftp_config.cfg")
+    config_path = os.path.join(basePath, "auth_config.cfg")
     creds=read_wget_credentials(config_path)
-
     download_with_wget(url,output,creds,os.path.join(basePath,"cacert.pem"))
     return output
 
