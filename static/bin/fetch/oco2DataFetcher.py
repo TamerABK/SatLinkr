@@ -3,7 +3,7 @@ import subprocess
 import configparser
 from datetime import datetime
 
-def read_wget_credentials(config_path="sftp_config.cfg"):
+def read_wget_credentials(config_path="auth_config.cfg"):
     config = configparser.ConfigParser()
     config.read(config_path)
 
@@ -16,8 +16,8 @@ def read_wget_credentials(config_path="sftp_config.cfg"):
 def download_with_wget(url,output,creds,cacert):
 
     try:
-        
-        subprocess.run(["wget",f"--ca-certificate={cacert}","--load-cookies",creds['cookies'], "--save-cookies",creds['cookies'],"--user", creds["username"], "--password", creds["password"], url, "-O", output], check=True)
+        print(["wget","--load-cookies",creds['cookies'], "--save-cookies",creds['cookies'],"--user", creds["username"], "--password", creds["password"], url, "-O", output])
+        subprocess.run(["wget","--load-cookies",creds['cookies'], "--save-cookies",creds['cookies'],"--user", creds["username"], "--password", creds["password"], url, "-O", output], check=True)
     except Exception as e:
         print(f"Error downloading file: {e}")
         return ""

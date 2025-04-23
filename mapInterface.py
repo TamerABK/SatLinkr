@@ -37,6 +37,7 @@ def choose_file(satellite,date:datetime):
 
     if satellite=="GOSAT":
         path=os.path.join(path,"SWPR")
+        os.makedirs(path, exist_ok=True)
         files=os.listdir(path)
         targetDate=date.strftime("%Y%m%d")
         for file  in files:
@@ -46,12 +47,15 @@ def choose_file(satellite,date:datetime):
     
     elif satellite=="OCO2": 
         path=os.path.join(path,str(date.year))
+        os.makedirs(path, exist_ok=True)
         files=os.listdir(path)
         targetDate=f"{str(date.year)[-2:]}{date.month:02d}{date.day:02d}"
         for file  in files:
             if file[11:17]==targetDate:
                 return os.path.join(path,file)
         return ""
+    return None
+
 
 def get_data(satellite,gas,band,lat,long,range,date,delta,satellite_criteria):
     
@@ -71,7 +75,7 @@ def get_data(satellite,gas,band,lat,long,range,date,delta,satellite_criteria):
            if file == "":
                return [],False
         return OCO2filter(file,gas,date,delta,lat,long,range,satellite_criteria),True
-         
+    return None
 
 
 @socketio.on('change_satellite')
