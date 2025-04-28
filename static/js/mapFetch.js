@@ -55,7 +55,7 @@ function shiftMapNorthByPercent(map, prc) {
     const centerPoint = map.project(center, zoom);
 
     // Compute 20% of the current map's pixel height
-    const heightInPixels = map.getSize().y;
+    const heightInPixels = window.map.getSize().y;
     const shiftPixels = heightInPixels * (prc/100);
 
     // Subtract pixels from Y to go north (Y increases downward)
@@ -83,9 +83,11 @@ function sendMapHTML(){
 
         const mapHTML=  document.getElementById('map');
         let html = mapHTML.innerHTML;
-        const width=  window.innerWidth;
-        const height= window.innerHeight;
+        const width=  window.map.getSize().x;
+        const height= window.map.getSize().y;
 
+        console.log(width);
+        console.log(height);
         // Replace old map init with updated one
         const updatedHtml = html.replace(/center:\s*\[[^,\]]+,\s*[^,\]]+\]/, `center: [${center.lat}, ${center.lng}]`)
                                 .replace(/&quot;zoom&quot;:\s*\d+/, `&quot;zoom&quot;: ${zoom}`)

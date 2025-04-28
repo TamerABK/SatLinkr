@@ -132,7 +132,9 @@ button:hover {
     100% { transform: rotate(360deg); }
 }
 
-#fetchBar{
+
+
+#mapBar, #fetchBar{
     margin-top: 8%;
     display: flex;
     flex-direction: column;

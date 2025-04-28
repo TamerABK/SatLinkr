@@ -33,13 +33,14 @@ socketio = SocketIO(app)
 
 
 def get_data(satellite,gas,band,lat,long,radius,date,delta,satellite_criteria):
+
     
     if satellite == "GOSAT":
-       
         return query_gosat(os.getcwd(),gas,band,date,delta,lat,long,radius),True
+      
     elif satellite == "OCO2":
-        print(os.getcwd())
         return query_oco2(os.getcwd(),date,delta,lat,long,radius,satellite_criteria),True
+
     return None
 
 
