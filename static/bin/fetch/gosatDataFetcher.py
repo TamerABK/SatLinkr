@@ -3,7 +3,6 @@ import paramiko
 import configparser
 import os
 
-
 data_paths = {
     "CLDD": "/pub/releaseData/standardProduct/CAI-2_L2/CLDD/0105",
     "AERP": "/pub/releaseData/standardProduct/CAI-2_L2/AERP/",
@@ -12,99 +11,114 @@ data_paths = {
     "TCAP": "/pub/releaseData/standardProduct/FTS-2_L2/TCAP/"
 }
 
+
 class InvalidTypeError(Exception):
     """Custom exception for invalid type requests."""
     pass
 
 
 def match_date_YYYYMMDD(filenames, targetDate):
-    # Iterate over filenames to find the first match for YYYYMMDD (12th to 19th characters)
     for filename in filenames:
-        if filename[11:19]==targetDate:
-            return filename  # Return the first matching filename
-    return None  # Return None if no match is found
+        if filename[11:19] == targetDate:
+            return filename
+    return None
+
 
 def match_date_YYYYMMDDHH(filenames, targetDate):
-    # Iterate over filenames to find the first match for YYYYMMDDHH (12th to 21st characters)
     for filename in filenames:
-        if filename[11:21]==targetDate:
-            return filename  # Return the first matching filename
-    return None  # Return None if no match is found
-
-# Read SFTP credentials from config file
-def read_sftp_credentials(config_path):
-    config = configparser.ConfigParser()
-    config.read(config_path)
-
-    return {
-        "host": config.get("SFTP", "host"),
-        "port": config.getint("SFTP", "port"),
-        "username": config.get("SFTP", "username"),
-        "password": config.get("SFTP", "password")
-    }
-
-# Connect to SFTP server
-def connect_sftp(creds):
-    
-    transport = paramiko.Transport((creds["host"], creds["port"]))
-    transport.connect(username=creds["username"], password=creds["password"])
-    return paramiko.SFTPClient.from_transport(transport)
-
-# List files in a remote directory
-def list_files(remote_path,creds):
-    try:
-        sftp = connect_sftp(creds)
-        files = sftp.listdir(remote_path)
-        sftp.close()
-        return files
-    except Exception as e:
-        print(f"Error listing files: {e}")
-        return []
-
-# Download a file from SFTP
-def download_file(remote_path, local_path,creds):
-    try:
-        sftp = connect_sftp(creds)
-        os.makedirs(os.path.dirname(local_path), exist_ok=True)
-        sftp.get(remote_path, local_path)
-        sftp.close()
-        return local_path
-    except Exception as e:
-        print(f"Error downloading file: {e}")
-        return ""
+        if filename[11:21] == targetDate:
+            return filename
+    return None
 
 
+class gosatDataFetcher(object):
+    def __init__(self, basePath):
+        self.basePath=basePath
+        self.config_path = os.path.join(basePath, "auth_config.cfg")
+        self.creds = self._read_sftp_credentials()
+        self.transport = None
+        self.sftp = None
 
-def handle_gosat_fetch(type:str,targetDate:datetime,basePath):
-    
-    if type not in data_paths:
-        raise InvalidTypeError(f"Invalid type: '{type}'. Available types: {list(data_paths.keys())}")
-    
-    
-    # Define the SFTP config file name
-    config_file_path = os.path.join(basePath, "auth_config.cfg")
-    creds=read_sftp_credentials(config_file_path)
-    local_path=os.path.join(basePath,"data","GOSAT",type)
-    path=data_paths[type]
+    def _read_sftp_credentials(self):
+        config = configparser.ConfigParser()
+        config.read(self.config_path)
+        return {
+            "host": config.get("SFTP", "host"),
+            "port": config.getint("SFTP", "port"),
+            "username": config.get("SFTP", "username"),
+            "password": config.get("SFTP", "password")
+        }
 
-    if type in ("CLDD","AERP"):
-        path = f"{path}/{targetDate.year}/"+f"{targetDate.month:02d}.{targetDate.day:02d}"
-        filename= match_date_YYYYMMDDHH(list_files(path,creds),f"{targetDate.year}{targetDate.month:02d}{targetDate.day:02d}{targetDate.hour:02d}")
-        
-    else:
-        path = f"{path}/{targetDate.year}" 
-        filename= match_date_YYYYMMDD(list_files(path,creds),f"{targetDate.year}{targetDate.month:02d}{targetDate.day:02d}")
-    
-    if (filename==None): 
-        return ""
+    def connect(self):
+        if self.sftp is None:
+            self.transport = paramiko.Transport((self.creds["host"], self.creds["port"]))
+            self.transport.connect(username=self.creds["username"], password=self.creds["password"])
+            self.sftp = paramiko.SFTPClient.from_transport(self.transport)
 
-    os.makedirs(local_path,exist_ok=True)
-    return download_file(f'{path}/{filename}',os.path.join(local_path,filename),creds)
-    
+    def close(self):
+        if self.sftp:
+            self.sftp.close()
+        if self.transport:
+            self.transport.close()
+        self.sftp = None
+        self.transport = None
+
+    def list_files(self, remote_path):
+        try:
+            self.connect()
+            return self.sftp.listdir(remote_path)
+        except Exception as e:
+            print(f"Error listing files: {e}")
+            return []
+
+    def download_file(self, remote_path, local_path):
+        try:
+            self.connect()
+            os.makedirs(os.path.dirname(local_path), exist_ok=True)
+            self.sftp.get(remote_path, local_path)
+            return local_path
+        except Exception as e:
+            print(f"Error downloading file: {e}")
+            return ""
+
+
+    def handle_gosat_fetch(self,type: str, targetDate: datetime):
+        if type not in data_paths:
+            raise InvalidTypeError(f"Invalid type: '{type}'. Available types: {list(data_paths.keys())}")
+
+
+
+        local_path = os.path.join(self.basePath, "data", "GOSAT", type)
+        path = data_paths[type]
+
+        try:
+            if type in ("CLDD", "AERP"):
+                path = f"{path}/{targetDate.year}/{targetDate.month:02d}.{targetDate.day:02d}"
+                filename = match_date_YYYYMMDDHH(
+                    self.list_files(path),
+                    f"{targetDate.year}{targetDate.month:02d}{targetDate.day:02d}{targetDate.hour:02d}"
+                )
+            else:
+                path = f"{path}/{targetDate.year}"
+                filename = match_date_YYYYMMDD(
+                    self.list_files(path),
+                    f"{targetDate.year}{targetDate.month:02d}{targetDate.day:02d}"
+                )
+
+            if filename is None:
+                return ""
+
+            os.makedirs(local_path, exist_ok=True)
+            return self.download_file(
+                f'{path}/{filename}',
+                os.path.join(local_path, filename)
+            )
+        finally:
+            self.close()
 
 
 # Example usage
 if __name__ == "__main__":
     # Example: List files in one of the given folders
-    handle_gosat_fetch("SWPR",datetime(day=1,month=1,year=2024),"./") 
+    handle_gosat_fetch("SWPR",datetime(day=1,month=1,year=2024),"C:\\Users\Enseignement\PycharmProjects\satelliteImageryApp")
 

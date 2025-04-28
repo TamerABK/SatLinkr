@@ -31,47 +31,16 @@ app.secret_key = os.urandom(24)
 socketio = SocketIO(app)    
 
 
-def choose_file(satellite,date:datetime):
-    
-    path=os.path.join(os.getcwd(), "data", satellite)
 
-    if satellite=="GOSAT":
-        path=os.path.join(path,"SWPR")
-        files=os.listdir(path)
-        targetDate=date.strftime("%Y%m%d")
-        for file  in files:
-            if file[11:19]==targetDate:
-                return os.path.join(path,file)
-        return ""
-    
-    elif satellite=="OCO2": 
-        path=os.path.join(path,str(date.year))
-        files=os.listdir(path)
-        targetDate=f"{str(date.year)[-2:]}{date.month:02d}{date.day:02d}"
-        for file  in files:
-            if file[11:17]==targetDate:
-                return os.path.join(path,file)
-        return ""
-
-def get_data(satellite,gas,band,lat,long,range,date,delta,satellite_criteria):
-    
-    file=choose_file(satellite,date)
+def get_data(satellite,gas,band,lat,long,radius,date,delta,satellite_criteria):
     
     if satellite == "GOSAT":
-        if file == "":
-           flash("Attempting to download data for this day")
-           file= handle_gosat_fetch("SWPR",date,os.getcwd())
-           if file == "":
-               return [],False
-        return SWPRfilter(file,gas,band,date,delta,lat,long,range),True
+       
+        return query_gosat(os.getcwd(),gas,band,date,delta,lat,long,radius),True
     elif satellite == "OCO2":
-        if file == "":
-           flash("Attempting to download data for this day")
-           file= handle_oco2_fetch(date,os.getcwd())
-           if file == "":
-               return [],False
-        return OCO2filter(file,gas,date,delta,lat,long,range,satellite_criteria),True
-         
+        print(os.getcwd())
+        return query_oco2(os.getcwd(),date,delta,lat,long,radius,satellite_criteria),True
+    return None
 
 
 @socketio.on('change_satellite')
@@ -107,8 +76,8 @@ def update_map():
     ground_criteria = request.form.get("ground_criteria")
 
     data, success = get_data(satellite, gas, band, latitude, longitude, radius, date, delta_time, satellite_criteria)
-
-    if data == []:
+    print(data)
+    if not data:
         if success:
             return jsonify({'error': "No data found within those parameters"})
         else:

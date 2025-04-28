@@ -13,11 +13,11 @@ def read_wget_credentials(config_path="sftp_config.cfg"):
         "cookies": config.get("OCO2","cookies")
     }
 
-def download_with_wget(url,output,creds,cacert):
+def download_with_wget(url,output,creds):
 
     try:
         
-        subprocess.run(["wget",f"--ca-certificate={cacert}","--load-cookies",creds['cookies'], "--save-cookies",creds['cookies'],"--user", creds["username"], "--password", creds["password"], url, "-O", output], check=True)
+        subprocess.run(["wget","--load-cookies",creds['cookies'], "--save-cookies",creds['cookies'],"--user", creds["username"], "--password", creds["password"], url, "-O", output], check=True)
     except Exception as e:
         print(f"Error downloading file: {e}")
         return ""
@@ -44,15 +44,12 @@ def handle_oco2_fetch(targetDate:datetime,basePath):
     output=os.path.join(output,url.split('/')[-1])
     config_path = os.path.join(basePath, "auth_config.cfg")
     creds=read_wget_credentials(config_path)
-    download_with_wget(url,output,creds,os.path.join(basePath,"cacert.pem"))
+    download_with_wget(url,output,creds)
     return output
 
 
 
 
 if __name__ == "__main__":
-    creds=read_wget_credentials()
-    url=matchURl(datetime(year=2022,month=4,day=11))
-    download_with_wget(url,f'./temp.nc4',creds)
-
+    handle_oco2_fetch(datetime(year=2024,month=4,day=11),'C:\\Users\Enseignement\PycharmProjects\satelliteImageryApp\\')
         
