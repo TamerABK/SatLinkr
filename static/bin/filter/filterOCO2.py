@@ -27,12 +27,11 @@ def query_oco2(basePath,date:datetime,delta,lat,lon,radius,quality_flag):
     else:
         flag=2**31
 
-    params = (time_start,time_end,lat,lon,radius,flag)
+    params = (time_start,time_end,lat,lon,radius)
     cursor.execute(query, params)
     results = cursor.fetchall()
 
     conn.close()
-    print(results)
     return results
     
 if __name__=='__main__':

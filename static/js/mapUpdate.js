@@ -4,6 +4,7 @@ document.getElementById("mapParams").addEventListener("submit", function(event) 
     event.preventDefault(); // prevent full page reload
 
     const formData = new FormData(this);
+    console.log(formData)
 
     fetch("/update_map", {
         method: "POST",

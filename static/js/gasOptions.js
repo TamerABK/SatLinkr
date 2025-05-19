@@ -1,25 +1,56 @@
 var socket = io.connect('http://127.0.0.1:5000');
 
+
+
+document.getElementById('region_option').addEventListener('change')
 // Listen for satellite changes
 document.getElementById('satellite').addEventListener('change', function() {
-    var satellite = this.value;
+    const satellite = this.value;
     socket.emit('change_satellite', { 'satellite': satellite });
     updateGasOptions(satellite);
-    hideBandOptions();
+    var bandContainer = document.getElementById('band-container');
 
     var flagContainer = document.getElementById('quality-container');
-    if (satellite == 'OCO2'){
-        flagContainer.style = "display:block";
+    if (satellite === 'OCO2'){
+        flagContainer.style.display = "block";
+        bandContainer.style.display = 'none';
     } else{
-        flagContainer.style = "display:none";
+        flagContainer.style.display = "none";
+        bandContainer.style.display = 'block';
     }
+
+});
+
+document.getElementById('existing_region1').addEventListener('change', async function () {
+
+    const region = this.value;
+
+    const response = await fetch('/regions', {method: 'GET'});
+    const regions = await response.json();
+
+    const details = regions.find(r => r.name === region);
+    const satellite = details.satellite;
+    socket.emit('change_satellite', { 'satellite': satellite });
+    updateGasOptions(satellite);
+    var bandContainer = document.getElementById('band-container');
+
+    var flagContainer = document.getElementById('quality-container');
+    if (satellite === 'OCO2'){
+        console.log('IN')
+        flagContainer.style.display = "block";
+        bandContainer.style.display = 'none';
+    } else{
+        flagContainer.style.display = "none";
+        bandContainer.style.display = 'block';
+    }
+
 
 });
 
 // Listen for gas changes
 document.getElementById('gas').addEventListener('change', function() {
-    var satellite = document.getElementById('satellite').value;
-    var gas = this.value;
+    const satellite = document.getElementById('satellite').value;
+    const gas = this.value;
     socket.emit('change_gas', { 'satellite': satellite, 'gas': gas });
     updateBandsForGas(gas);
 });
@@ -38,24 +69,26 @@ socket.on('update_gases', function(data) {
 
     // Automatically update bands for the default gas (post form submission)
     var defaultGas = gasSelect.value;
+
     updateBandsForGas(defaultGas);
 });
 
 // Listen for updated band options from the server
 socket.on('update_bands', function(data) {
+
+
     var bandSelect = document.getElementById('band');
     bandSelect.innerHTML = '';  // Clear existing options
     if (data.bands.length > 0) {
         // Show the band container
-        document.getElementById('band-container').style.display = 'block';
+        var bandContainer = document.getElementById('band-container');
+        bandContainer.style.display='block'
         data.bands.forEach(function(band) {
             var option = document.createElement('option');
             option.value = band;
             option.text = band;
             bandSelect.add(option);
         });
-    } else {
-        hideBandOptions();
     }
 });
 
@@ -72,11 +105,7 @@ function updateBandsForGas(gas) {
     socket.emit('change_gas', { 'satellite': satellite, 'gas': gas });
 }
 
-// Hide the band options if there's no need to show them
-function hideBandOptions() {
-    var bandContainer = document.getElementById('band-container');
-    bandContainer.style.display = 'none';  // Hide the band container
-}
+
 
 // Run on page load to initialize the default values
 function reload() {

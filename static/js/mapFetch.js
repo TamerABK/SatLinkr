@@ -77,7 +77,7 @@ function sendMapHTML(){
     loader.style.display='block';
 
     
-        const center= shiftMapNorthByPercent(window.map,19);
+        const center= shiftMapNorthByPercent(window.map,0);
         const zoom= window.map.getZoom();
 
 

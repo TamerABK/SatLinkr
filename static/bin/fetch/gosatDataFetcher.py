@@ -108,6 +108,8 @@ class gosatDataFetcher(object):
             if filename is None:
                 return ""
 
+
+
             os.makedirs(local_path, exist_ok=True)
             return self.download_file(
                 f'{path}/{filename}',
@@ -117,8 +119,4 @@ class gosatDataFetcher(object):
             self.close()
 
 
-# Example usage
-if __name__ == "__main__":
-    # Example: List files in one of the given folders
-    handle_gosat_fetch("SWPR",datetime(day=1,month=1,year=2024),"C:\\Users\Enseignement\PycharmProjects\satelliteImageryApp")
 

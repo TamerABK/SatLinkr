@@ -67,3 +67,20 @@ CREATE TABLE IF NOT EXISTS GOSAT(
     UNIQUE(observationTime, latitude, longitude)
 );
 
+
+CREATE TABLE IF NOT EXISTS fetched_regions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    region_name TEXT NOT NULL,
+    satellite TEXT NOT NULL,
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL,
+    radius_km REAL NOT NULL,
+    start_timestamp INTEGER NOT NULL,
+    end_timestamp INTEGER NOT NULL,
+    status TEXT DEFAULT 'fetched',
+    fetched_at INTEGER DEFAULT (strftime('%s', 'now')),
+    created_at INTEGER DEFAULT (strftime('%s', 'now')),
+    UNIQUE(latitude, longitude, radius_km),
+    UNIQUE(region_name)
+);
+
