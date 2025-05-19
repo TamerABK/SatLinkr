@@ -22,6 +22,7 @@ def genPng():
     * {{
         margin: 0;
         padding: 0;
+        padding: 0;
         box-sizing: border-box;
     }}
      html, body, #map {{
@@ -30,7 +31,11 @@ def genPng():
         width: 100%;
         height: 100vh;
         overflow: hidden;
-    }}</style></head>
+    }}
+    #map{{
+        height: 99vh;
+    }}
+    </style></head>
     <body>
     <div id="map" >{map_html}</div>
     </body>
@@ -91,8 +96,8 @@ def genPng():
             break
 
     # Crop the image
-    if cutoff < height:
-        img_cropped = img.crop((0, 0, width, cutoff))
-        img_cropped.save(png_path)
+    #if cutoff < height:
+        #img_cropped = img.crop((0, 0, width, cutoff))
+        #img_cropped.save(png_path)
     # Send the file and clean up
     return send_file(png_path, mimetype='image/png')

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Satellite Map with Atmospheric Data</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mapStyling.css') }}" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
 
@@ -41,16 +43,47 @@
                 <button id="toggle1" class="toggle-btn active" onclick="showSidebar(1)">Map Params</button>
                 <button id="toggle2" class="toggle-btn" onclick="showSidebar(2)">Fetch Data</button>
             </div>
-            
+
+            <div class="card-container">
+
+            </div>
+
             <div id="mapBar">
                 <h1>Atmospheric Data Controls</h1>
                 <form id="mapParams" method="POST">
 
-                    <label for="satellite">Select Satellite</label>
-                    <select name="satellite" id="satellite">
-                        <option value="OCO2" {% if satellite == "OCO2" %}selected{% endif %}>OCO 2</option>
-                        <option value="GOSAT" {% if satellite == "GOSAT" %}selected{% endif %}>GOSAT</option>
+                    <label for="region_select">Choose Region Option:</label>
+                    <select id="region_select" name="region_option" onchange="toggleRegionSelect()" >
+                        <option value="existing" {% if option == "existing" %}selected{% endif %}>Select Existing Region</option>
+                        <option value="custom" {% if option == "else" %}selected{% endif %}>Custom zone</option>
                     </select>
+
+
+                    <div id="selectRegion">
+                        <label for="existing_region1">Select Region:</label>
+                        <select class="existing_region" name="existing_region" id="existing_region1">
+
+                        </select>
+                    </div>
+
+                    <div id="customRegion" style="display: none">
+                        <label for="satellite">Select Satellite</label>
+                        <select name="satellite" id="satellite">
+                            <option value="OCO2" {% if satellite == "OCO2" %}selected{% endif %}>OCO 2</option>
+                            <option value="GOSAT" {% if satellite == "GOSAT" %}selected{% endif %}>GOSAT</option>
+                        </select><br>
+
+                    <label for="latitude">Latitude:</label>
+                    <input type="number" step="any" id="latitude" name="latitude" value="{{ latitude }}" required><br>
+
+                    <label for="longitude">Longitude:</label>
+                    <input type="number" step="any" id="longitude" name="longitude" value="{{ longitude }}" required><br>
+
+                    <label for="radius">Zone radius (km): </label>
+                    <input type="number" id="radius" name="radius" min="1" max="10000" value="{{ radius }}" oninput="updateRadiusValue()">
+
+
+                    </div>
 
                     <label for="gas">Select a Gas:</label>
                     <select name="gas" id="gas">
@@ -69,15 +102,6 @@
                         </select>
                     </div>
 
-                    <label for="latitude">Latitude:</label>
-                    <input type="number" step="any" id="latitude" name="latitude" value="{{ latitude }}" required><br>
-
-                    <label for="longitude">Longitude:</label>
-                    <input type="number" step="any" id="longitude" name="longitude" value="{{ longitude }}" required><br>
-
-                    <label for="radius">Zone radius (km): <span id="radius-value">10</span> </label>
-                    <input type="range" id="radius" name="radius" min="1" max="10000" value="{{ radius }}" oninput="updateRadiusValue()">
-
                     <label for="datetime">Date (dd/mm/yyyy hh:mm):</label>
                     <input type="datetime" name="datetime" id="datetime" value="{{ datetime }}" required><br>
 
@@ -91,40 +115,83 @@
                             <option value="False" {% if satellite_criteria == "False" %}selected{% endif %}>False</option>
                         </select><br>
                     </div>
-                    <label for="ground_criteria">Ground data selection criteria:</label>
-                    <label><input type="checkbox" id="ground_criteria" name="ground_criteria" value="flag" {% if ground_criteria == "flag" %}checked{% endif %}> Flag</label>
 
                     <button type="submit">Update Map</button>
                     <div id="selected_gas" data-value="{{ selected_gas }}"></div>
                     <div id="selected_band" data-value="{{ selected_band }}"></div>
-                    <button type="button" onclick="sendMapHTML()">Donwload Map </button>
+                    <button type="button" onclick="sendMapHTML()"> Download Map </button>
                 </form>
             </div>
 
 
             <div id="fetchBar" style="display: none;">
                 <h1>Fetching data </h1>
-                <form id="customParams" method="POST">
-                    <label for="latitude2">Latitude:</label>
-                    <input type="number" step="any" id="latitude2" name="latitude2" required><br>
-            
-                    <label for="longitude2">Longitude:</label>
-                    <input type="number" step="any" id="longitude2" name="longitude2" required><br>
-            
-                    <label for="customradius">Select radius (km): <span id="custom-radius-value">10</span></label>
-                    <input type="radius" id="customradius" name="customradius" min="1" max="10000" value="10" oninput="document.getElementById('custom-radius-value').textContent = this.value;"><br>
-            
-                    <label for="year">Year:</label>
-                    <input type="number" id="year" name="year" min="2000" max="2030" value="2024"><br>
-            
-                    <button type="submit">Search</button>
-                    <button type="reset">Reset</button>
+
+                <form id="fetchParams" method="POST">
+
+                    <label for="source">Choose Region Option:</label>
+                    <select id="source" name="source" >
+                        <option value="local">Local files only</option>
+                        <option value="download" >Local and downloaded files</option>
+                    </select>
+
+
+                    <!-- Option Selector -->
+                    <label for="region_option">Choose Region Option:</label>
+                    <select id="region_option" name="region_option" onchange="toggleRegionFields()" >
+                        <option value="existing" {% if option == "existing" %}selected{% endif %}>Select Existing Region</option>
+                        <option value="new" {% if option == "else" %}selected{% endif %}>Create New Region</option>
+                    </select>
+
+                    <!-- Existing Region Dropdown -->
+                    <div id="existing_region_div" >
+                        <label for="existing_region2">Select Region:</label>
+                        <select class="existing_region" name="existing_region" id="existing_region2">
+
+                        </select>
+                    </div>
+
+                    <!-- New Region Input Fields -->
+                    <div id="new_region_div" style="display: none;">
+                        <label for="region_name">Region Name</label>
+                        <input type="text" id="region_name" name="region_name"><br>
+
+                        <label for="satellite_fetch">Select Satellite</label>
+                        <select name="satellite_fetch" id="satellite_fetch">
+                            <option value="OCO2" {% if satellite == "OCO2" %}selected{% endif %}>OCO 2</option>
+                            <option value="GOSAT" {% if satellite == "GOSAT" %}selected{% endif %}>GOSAT</option>
+                        </select><br>
+
+                        <label for="latitude_fetch">Latitude:</label>
+                        <input type="number" step="any" id="latitude_fetch" name="latitude_fetch"><br>
+
+                        <label for="longitude_fetch">Longitude:</label>
+                        <input type="number" step="any" id="longitude_fetch" name="longitude_fetch"><br>
+
+                        <label for="radius_fetch">Select radius (km): </label>
+                        <input type="number" id="radius_fetch" name="radius_fetch" min="1" max="10000" value="10"><br>
+                    </div>
+
+                    <label for="datetime_start">Starting date (dd/mm/yyyy):</label>
+                    <input type="datetime" name="datetime_start" id="datetime_start"  required><br>
+
+                    <label for="datetime_end">Ending Date (dd/mm/yyyy):</label>
+                    <input type="datetime" name="datetime_end" id="datetime_end"  required><br>
+
+                    <label><input type="checkbox" id="keepOption" name="keepOption">  Keep files </label>
+
+                    <button type="submit">Fetch</button>
                 </form>
-            </div>
+
+
 
         </div>
     </div>
 
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="{{ url_for('static', filename='js/flashTimeout.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mapResize.js') }}"></script>
@@ -133,5 +200,8 @@
     <script src="{{ url_for('static', filename='js/mapFetch.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mapUpdate.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sidebarControl.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/viewCalendar.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/fetchFormControl.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/fetchRequest.js') }}"></script>
 </body>
 </html>
