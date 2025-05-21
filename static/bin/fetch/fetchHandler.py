@@ -12,11 +12,11 @@ class FetchHandler:
         self.conn.row_factory = sqlite3.Row
         self.cursor = self.conn.cursor()
 
-    def _region_exists(self, lat, lon, radius_km):
+    def _region_exists(self, lat, lon, radius_km, satellite):
         self.cursor.execute("""
             SELECT region_name FROM fetched_regions
-            WHERE latitude = ? AND longitude = ? AND radius_km = ?
-        """, (lat, lon, radius_km))
+            WHERE latitude = ? AND longitude = ? AND radius_km = ? AND  satellite = ?
+        """, (lat, lon, radius_km, satellite))
         return self.cursor.fetchone()
 
     def _name_conflict(self, region_name, lat, lon, radius_km):
@@ -58,7 +58,7 @@ class FetchHandler:
         # 1. Prevent same lat/lon/radius with different name
         try:
             print("About to call _region_exists()")
-            existing = self._region_exists(lat, lon, radius_km)
+            existing = self._region_exists(lat, lon, radius_km,satellite)
             print("Existing region:", existing)
         except Exception as e:
             print("Error calling _region_exists():", e)
@@ -86,17 +86,20 @@ class FetchHandler:
             fetchStatus = "Data fetched"
 
         # 5. Create new region entry
-        self.cursor.execute("""
-            INSERT INTO fetched_regions (
-                region_name, satellite, latitude, longitude, radius_km,
-                start_timestamp, end_timestamp, status, fetched_at, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            region_name, satellite, lat, lon, radius_km,
-            start_ts, end_ts,fetchStatus, now_ts, now_ts
-        ))
-        self.conn.commit()
-        return "New region fetch registered."
+        try:
+            self.cursor.execute("""
+                                INSERT INTO fetched_regions (region_name, satellite, latitude, longitude, radius_km,
+                                                             start_timestamp, end_timestamp, status, fetched_at,
+                                                             created_at)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                """, (
+                                    region_name, satellite, lat, lon, radius_km,
+                                    start_ts, end_ts, fetchStatus, now_ts, now_ts
+                                ))
+            self.conn.commit()
+        except sqlite3.Error as e:
+            print("Error inserting into fetched_regions:", e)
+            raise
 
     def close(self):
         self.conn.close()

@@ -91,6 +91,7 @@ class GOSATInserter(BaseInserter):
 
             for i in range(lats.size):
                 try:
+
                     if haversine((lat, long), (lats[i], longs[i]), unit=Unit.KILOMETERS) <= radius:
                         row = (
                             observationTimes[i],  # observationTime
@@ -140,6 +141,7 @@ class GOSATInserter(BaseInserter):
                         )
 
                         data.append(row)
+
                 except ValueError:
                     continue
 

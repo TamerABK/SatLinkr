@@ -14,5 +14,6 @@ document.getElementById("fetchParams").addEventListener("submit", function(event
     }).finally(() => {
         console.log('Fetch Done')
         loader.style.display = 'none';
+        window.location.reload();
     });
 });

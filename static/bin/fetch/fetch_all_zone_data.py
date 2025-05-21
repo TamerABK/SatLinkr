@@ -11,7 +11,7 @@ import re
 from datetime import datetime
 from typing import Optional
 
-def find_file_by_date(path, file_type: str, date: datetime) -> Optional[str]:
+def find_file_by_date(path, file_type: str, date: datetime):
 
 
     if not os.path.isdir(path):
@@ -24,8 +24,8 @@ def find_file_by_date(path, file_type: str, date: datetime) -> Optional[str]:
 
     # Define regex patterns for each file type
     patterns = {
-        'gosat': re.compile(r'GOSAT.*?(\d{6})_'),        # e.g. GOSAT2TFTS220324_...
-        'oco2': re.compile(r'oco2_LtCO2_(\d{6})_'),      # e.g. oco2_LtCO2_220324_...
+        'gosat': re.compile(r'GOSAT2TFTS2(\d{8})_'),  # e.g. GOSAT2TFTS220220124_...
+        'oco2': re.compile(r'oco2_LtCO2_(\d{6})_'),  # e.g. oco2_LtCO2_220324_...
     }
 
     pattern = patterns.get(file_type.lower())
@@ -33,12 +33,13 @@ def find_file_by_date(path, file_type: str, date: datetime) -> Optional[str]:
         raise ValueError("Unsupported file_type. Use 'gosat' or 'oco2'.")
 
 
+
     for filename in os.listdir(path):
         match = pattern.search(filename)
         if match and match.group(1) == date_str[file_type.lower()]:
-            return os.path.join(path, filename)
+            return os.path.join(path, filename),True
 
-    return ""
+    return "",False
 
 
 def collect(satellite,lat,long,radius,start_date,end_date,basePath, localOnly, keepOption):
@@ -53,7 +54,7 @@ def collect(satellite,lat,long,radius,start_date,end_date,basePath, localOnly, k
 
             localDataPath= os.path.join(basePath,"data","OCO2",str(date.year))
             os.makedirs(localDataPath,exist_ok=True)
-            file = find_file_by_date(localDataPath,"OCO2",date)
+            file,foundLocally = find_file_by_date(localDataPath,"OCO2",date)
 
             if file == "" and not localOnly:
                 file=handle_oco2_fetch(date,basePath)
@@ -63,7 +64,7 @@ def collect(satellite,lat,long,radius,start_date,end_date,basePath, localOnly, k
                 nbData+=len(data)
                 Dbcontroller.insert_data(data)
 
-                if not keepOption and not localOnly:
+                if not keepOption and not localOnly and not foundLocally:
                     os.remove(file)
 
             date=date+timedelta(days=1)
@@ -74,9 +75,11 @@ def collect(satellite,lat,long,radius,start_date,end_date,basePath, localOnly, k
         Fetcher=  gosatDataFetcher(basePath)
         localDataPath= os.path.join(basePath,"data","GOSAT","SWPR")
 
+
+
         while (date<=end_date):
 
-            file= find_file_by_date(localDataPath,"GOSAT",date)
+            file,foundLocally= find_file_by_date(localDataPath,"GOSAT",date)
 
             if file == "" and not localOnly:
                 file=Fetcher.handle_gosat_fetch("SWPR",date)
@@ -86,7 +89,7 @@ def collect(satellite,lat,long,radius,start_date,end_date,basePath, localOnly, k
                 nbData += len(data)
                 Dbcontroller.insert_data(data)
 
-                if not keepOption and not localOnly:
+                if not keepOption and not localOnly and not foundLocally:
                     os.remove(file)
 
             date=date+timedelta(days=1)

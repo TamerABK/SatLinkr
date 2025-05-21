@@ -66,7 +66,7 @@ def genPng():
     time.sleep(5)  # Let it render
 
     png_path = os.path.join(os.getcwd(),'tmp', 'mp.png')
-    print("Saving page source for debug...")
+
     with open("tmp/debug_source.html", "w", encoding="utf-8") as f:
         f.write(driver.page_source)
     driver.get_screenshot_as_file(png_path)
