@@ -1,6 +1,7 @@
 import os
 import subprocess
 import configparser
+import sys
 from datetime import datetime
 
 def read_wget_credentials(config_path="auth_config.cfg"):
@@ -13,11 +14,21 @@ def read_wget_credentials(config_path="auth_config.cfg"):
         "cookies": config.get("OCO2","cookies")
     }
 
+def get_wget_path():
+    if hasattr(sys, '_MEIPASS'):
+        # Exécution depuis un exécutable PyInstaller
+        return os.path.join(sys._MEIPASS, 'static', 'bin', 'wget.exe')
+    else:
+        # Exécution depuis le code source
+        return os.path.join(os.getcwd(), 'static', 'bin', 'wget.exe')
+
 def download_with_wget(url,output,creds):
+
 
     try:
 
-        subprocess.run(["wget","--load-cookies",creds['cookies'], "--save-cookies",creds['cookies'],"--user", creds["username"], "--password", creds["password"], url, "-O", output], check=True)
+        subprocess.run([get_wget_path(),"--load-cookies",creds['cookies'], "--save-cookies",creds['cookies'],"--user", creds["username"], "--password", creds["password"], url, "-O", output], check=True)
+        return None
     except Exception as e:
         print(f"Error downloading file: {e}")
         return ""

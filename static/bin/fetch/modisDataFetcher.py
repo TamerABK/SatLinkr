@@ -22,14 +22,17 @@ def download_file_by_date(data_dict, target_date, token, path):
             print(f"Downloading: {filename} from {url}")
             response = requests.get(url, headers=headers, stream=True)
             if response.status_code == 200:
-                with open(os.path.join(path,filename), "wb") as f:
+                filePath = os.path.join(path, filename)
+                with open(filePath, "wb") as f:
                     for chunk in response.iter_content(chunk_size=8192):
                         if chunk:
                             f.write(chunk)
                 print(f"Downloaded {filename} successfully.")
+                return filePath
             else:
                 print(f"Failed to download file. Status code: {response.status_code}")
                 print(f"Response: {response.text[:200]}...")  # Show preview of the error
+    return " "
 
 
 def read_token(config_path):
@@ -43,10 +46,10 @@ def handle_modis_fetch(type, target_date, basePath):
     config_path = os.path.join(basePath, "auth_config.cfg")
     token = read_token(config_path)
 
-    if type == 'Terra-Aqua' :
+    if type == 'TerraAqua' :
         with open(os.path.join(basePath,'OPDEPTH.json'),'r') as file:
             urls= json.load(file)
-    elif type == 'Deep Blue' :
+    elif type == 'MODIS_DEEP_BLUE' :
         with open(os.path.join(basePath,'DEEP.json'),'r') as file:
             urls= json.load(file)
 
@@ -55,5 +58,5 @@ def handle_modis_fetch(type, target_date, basePath):
 
 if __name__=='__main__':
 
-    handle_modis_fetch('Deep Blue', datetime(year=2024,month=4,day=11), os.path.join('D:\Etudiant 5\Bureau\TAMER\satelliteImageryApp'))
-    handle_modis_fetch('Terra-Aqua', datetime(year=2023,month=1,day=25), os.path.join('D:\Etudiant 5\Bureau\TAMER\satelliteImageryApp'))
+    handle_modis_fetch('MODIS_DEEP_BLUE', datetime(year=2024,month=4,day=12), os.path.join('C:\\Users\Enseignement\PycharmProjects\satelliteImageryApp'))
+    handle_modis_fetch('TerraAqua', datetime(year=2023,month=1,day=25), os.path.join('C:\\Users\Enseignement\PycharmProjects\satelliteImageryApp'))

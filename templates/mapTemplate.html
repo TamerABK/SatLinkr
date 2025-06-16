@@ -54,8 +54,8 @@
 
                     <label for="region_select">Choose Region Option:</label>
                     <select id="region_select" name="region_option" onchange="toggleRegionSelect()" >
-                        <option value="existing" {% if option == "existing" %}selected{% endif %}>Select Existing Region</option>
-                        <option value="custom" {% if option == "else" %}selected{% endif %}>Custom zone</option>
+                        <option value="existing" selected>Select Existing Region</option>
+                        <option value="custom" >Custom zone</option>
                     </select>
 
 
@@ -71,6 +71,7 @@
                         <select name="satellite" id="satellite">
                             <option value="OCO2" {% if satellite == "OCO2" %}selected{% endif %}>OCO 2</option>
                             <option value="GOSAT" {% if satellite == "GOSAT" %}selected{% endif %}>GOSAT</option>
+                            <option value="MODIS_DEEP_BLUE" {% if satellite == "MODIS_DEEP_BLUE" %} selected {% endif %}>Modis Deep Blue</option>
                         </select><br>
 
                     <label for="latitude">Latitude:</label>
@@ -102,10 +103,10 @@
                         </select>
                     </div>
 
-                    <label for="datetime">Date (dd/mm/yyyy hh:mm):</label>
+                    <label for="datetime" id="date_span">Date (dd/mm/yyyy hh:mm):</label>
                     <input type="datetime" name="datetime" id="datetime" value="{{ datetime }}" required><br>
 
-                    <label for="delta_time">Delta times (minutes):</label>
+                    <label for="delta_time" id="delta_span">Delta times (minutes):</label>
                     <input type="number" id="delta_time" name="delta_time" value="{{ delta_time }}" required><br>
                     
                     <div id="quality-container" style="display: block;">
@@ -119,7 +120,10 @@
                     <button type="submit">Update Map</button>
                     <div id="selected_gas" data-value="{{ selected_gas }}"></div>
                     <div id="selected_band" data-value="{{ selected_band }}"></div>
-                    <button type="button" onclick="sendMapHTML()"> Download Map </button>
+                    <div id="download_buttons">
+                        <button type="button" onclick="sendMapHTML()"> Download Map </button>
+                        <button type="button" onclick="sendCSV()">Download CSV </button>
+                    </div>
                 </form>
             </div>
 
@@ -129,7 +133,7 @@
 
                 <form id="fetchParams" method="POST">
 
-                    <label for="source">Choose Region Option:</label>
+                    <label for="source">Choose File source:</label>
                     <select id="source" name="source" >
                         <option value="local">Local files only</option>
                         <option value="download" >Local and downloaded files</option>
@@ -160,6 +164,7 @@
                         <select name="satellite_fetch" id="satellite_fetch">
                             <option value="OCO2" {% if satellite == "OCO2" %}selected{% endif %}>OCO 2</option>
                             <option value="GOSAT" {% if satellite == "GOSAT" %}selected{% endif %}>GOSAT</option>
+                            <option value="MODIS_DEEP_BLUE" {% if satellite == "MODIS_DEEP_BLUE" %} selected {% endif %}>Modis Deep Blue</option>
                         </select><br>
 
                         <label for="latitude_fetch">Latitude:</label>
@@ -196,8 +201,8 @@
     <script src="{{ url_for('static', filename='js/flashTimeout.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mapResize.js') }}"></script>
     <script src="{{ url_for('static', filename='js/gasOptions.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/radiusDisplay.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mapFetch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/csvFetch.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mapUpdate.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sidebarControl.js') }}"></script>
     <script src="{{ url_for('static', filename='js/viewCalendar.js') }}"></script>

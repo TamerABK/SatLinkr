@@ -70,10 +70,7 @@ class FetchHandler:
         if self._name_conflict(region_name, lat, lon, radius_km):
             raise ValueError(f"Region name '{region_name}' already used for different coordinates.")
 
-        # 3. Check for full coverage
-        overlap = self._fetch_overlap(region_name, start_ts, end_ts)
-        if overlap and start_ts >= overlap["start_timestamp"] and end_ts <= overlap["end_timestamp"]:
-            raise ValueError(f"This period is already fetched for region '{region_name}'.")
+
 
         now_ts = int(time.time())
 

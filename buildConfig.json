@@ -7,7 +7,7 @@
   },
   {
    "optionDest": "filenames",
-   "value": "D:/Etudiant 5/Bureau/TAMER/satelliteImageryApp/mapInterface.py"
+   "value": "C:/Users/Enseignement/PycharmProjects/satelliteImageryApp/mapInterface.py"
   },
   {
    "optionDest": "onefile",
@@ -22,16 +22,12 @@
    "value": false
   },
   {
-   "optionDest": "optimize",
-   "value": "2"
-  },
-  {
    "optionDest": "strip",
    "value": false
   },
   {
    "optionDest": "noupx",
-   "value": false
+   "value": true
   },
   {
    "optionDest": "disable_windowed_traceback",
@@ -55,11 +51,15 @@
   },
   {
    "optionDest": "datas",
-   "value": "D:/Etudiant 5/Bureau/TAMER/satelliteImageryApp/static;static/"
+   "value": "C:/Users/Enseignement/PycharmProjects/satelliteImageryApp/static;static/"
   },
   {
    "optionDest": "datas",
-   "value": "D:/Etudiant 5/Bureau/TAMER/satelliteImageryApp/templates;templates/"
+   "value": "C:/Users/Enseignement/PycharmProjects/satelliteImageryApp/templates;templates/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/Enseignement/PycharmProjects/satelliteImageryApp/tmp;tmp/"
   },
   {
    "optionDest": "hiddenimports",
@@ -68,10 +68,6 @@
   {
    "optionDest": "hiddenimports",
    "value": "engineio.async_drivers.threading"
-  },
-  {
-   "optionDest": "datas",
-   "value": "D:/Etudiant 5/Bureau/TAMER/satelliteImageryApp/tmp;tmp/"
   }
  ],
  "nonPyinstallerOptions": {

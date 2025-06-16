@@ -1,10 +1,29 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from flask import request, send_file
 from PIL import Image
 import time
 import os
+import re
 
+def extract_map_js_from_html(html):
+    # Cherche le srcdoc de l'iframe
+    m = re.search(r'iframe[^>]+srcdoc="([^"]+)"', html)
+    if not m:
+        raise ValueError("Pas de srcdoc trouvé dans l'iframe")
+    srcdoc = m.group(1)
+    # Décodage des entités HTML
+    from html import unescape
+    srcdoc = unescape(srcdoc)
+    # Extrait le JS d'initialisation (entre <script> et </script>)
+    js_match = re.search(r'<script>(.*?)</script>\s*</html>', srcdoc, re.DOTALL)
+    if not js_match:
+        raise ValueError("Pas de script d'initialisation trouvé")
+    map_js = js_match.group(1)
+    return map_js
 
 def genPng():
  
@@ -18,7 +37,10 @@ def genPng():
     full_html = f"""
     <!DOCTYPE html>
     <html>
-    <head><meta charset="utf-8"><style>
+    <head><meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <style>
+    
     * {{
         margin: 0;
         padding: 0;
@@ -37,7 +59,12 @@ def genPng():
     }}
     </style></head>
     <body>
-    <div id="map" >{map_html}</div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <div id="map" >
+    <script>
+        {extract_map_js_from_html(map_html)}
+    </script>
+    </div>
     </body>
     </html>
     """
@@ -63,7 +90,7 @@ def genPng():
     driver = webdriver.Chrome(options=options)
     driver.set_window_size(width, height)
     driver.get("file://" + html_path)
-    time.sleep(5)  # Let it render
+    time.sleep(3)
 
     png_path = os.path.join(os.getcwd(),'tmp', 'mp.png')
 
@@ -96,8 +123,8 @@ def genPng():
             break
 
     # Crop the image
-    #if cutoff < height:
-        #img_cropped = img.crop((0, 0, width, cutoff))
-        #img_cropped.save(png_path)
+    if cutoff < height:
+        img_cropped = img.crop((0, 0, width, cutoff))
+        img_cropped.save(png_path)
     # Send the file and clean up
     return send_file(png_path, mimetype='image/png')

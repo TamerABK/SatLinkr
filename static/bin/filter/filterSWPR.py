@@ -2,7 +2,6 @@ import os
 import sqlite3
 from datetime import datetime,timedelta
 from haversine import haversine,Unit
-from utils import *
 
 import h5py
 

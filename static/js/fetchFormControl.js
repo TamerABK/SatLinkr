@@ -22,3 +22,8 @@ function toggleRegionSelect(){
 
 
 }
+
+  window.onload = function () {
+    toggleRegionSelect();
+    toggleRegionFields();
+  };
