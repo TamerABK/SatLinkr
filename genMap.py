@@ -7,57 +7,111 @@ import os
 sys.path.append(os.path.join(os.getcwd(),"static","bin","filter"))
 from static.bin.filter.filterSWPR import *
 import numpy as np
+import matplotlib.colors as mcolors
 
 
-def generate_map(lat,long,radius,gas_data):
+
+
+
+
+def get_color(value, gradient):
+    stops = sorted((float(k), v) for k, v in gradient.items())
+    for i, (stop, color) in enumerate(stops):
+        if value <= stop:
+            if i == 0:
+                return color
+            prev_stop, prev_color = stops[i-1]
+            ratio = (value - prev_stop) / (stop - prev_stop)
+            prev_rgb = np.array(mcolors.to_rgb(prev_color))
+            curr_rgb = np.array(mcolors.to_rgb(color))
+            interp_rgb = prev_rgb * (1 - ratio) + curr_rgb * ratio
+            return mcolors.to_hex(interp_rgb)
+    return stops[-1][1]
+
+def generate_map(lat, long, radius, gas_data, scale_title, mode='heatmap'):
+    heat_gradient = {
+        "0.0": "#0000FF",
+        "0.2": "#00FF00",
+        "0.3": "#FFFF00",
+        "0.5": "#FFA500",
+        "0.7": "#FF0000",
+        "0.99": "#8B0000",
+        "1.0": "#800080"
+    }
+
+    square_gradient = {
+        0.0: "#0000FF",
+        0.2: "#00FF00",
+        0.3: "#FFFF00",
+        0.5: "#FFA500",
+        0.7: "#FF0000",
+        0.99: "#8B0000",
+        1.0: "#8B0000"
+    }
+
     m = folium.Map(
         location=[lat, long],
         zoom_start=12,
         min_zoom=4,
         max_zoom=18,
-        tiles="CartoDB dark_matter",  
-        control_scale=True,      
+        tiles="CartoDB dark_matter",
+        control_scale=True,
     )
 
-    if gas_data!=[]:    
-        # Convert numpy.float32 values to standard Python float
+    if gas_data != []:
         gas_data = [[float(x[0]), float(x[1]), float(x[2])] for x in gas_data]
-        
-        # Get the maximum ppm value for normalization
-        max_ppm = math.ceil(max([x[2] for x in gas_data ]))
-        min_ppm=math.floor(min([x[2] for x in gas_data ] ))
+        max_ppm = math.ceil(max([x[2] for x in gas_data]))
+        min_ppm = math.floor(min([x[2] for x in gas_data]))
 
-        # Define the extended gradient for the ppm levels
-        gradient = {
-            "0.0": "#0000FF",    # Blue (350 ppm)
-            "0.2": "#00FF00",    # Green (380 ppm)
-            "0.3": "#FFFF00",    # Yellow (400 ppm)
-            "0.5": "#FFA500",    # Orange (450 ppm)
-            "0.7": "#FF0000",    # Red (500 ppm)
-            "0.99": "#8B0000",    # Dark Red (550 ppm)
-            "1.0": "#800080"     # Purple (600 ppm)
-        }
 
-        # Normalize the ppm values and map them to the gradient
-        # Normalize gas data ppm values to be between 0 and 1 based on the max_ppm
-        normalized_gas_data = [
-            [x[0], x[1], (x[2]-min_ppm) / (max_ppm-min_ppm)  ] for x in gas_data if x[2] != -999.0 
-        ]
 
-        # Add Heatmap layer to the map with customized extended gradient
-        HeatMap(normalized_gas_data, 
-                radius=5, 
-                blur=0.1, 
-                min_opacity=0.5,
-                max_zoom=100,
-                gradient=gradient
-        ).add_to(m)
+        if mode == 'heatmap':
+            normalized_gas_data = [
+                [x[0], x[1], (x[2]-min_ppm) / (max_ppm-min_ppm)] for x in gas_data if x[2] != -999.0
+            ]
+            HeatMap(normalized_gas_data,
+                    radius=5,
+                    blur=0.1,
+                    min_opacity=0.5,
+                    max_zoom=100,
+                    gradient=heat_gradient
+            ).add_to(m)
 
-        folium.Circle(
-            location=[lat, long],  # Center of the circle
-            radius=1000*radius,  # Radius in meters
-            color='black',  # Circle color
-        ).add_to(m)
+            folium.Circle(
+                location=[lat, long],
+                radius=1000 * radius,
+                color='black',
+            ).add_to(m)
+
+        elif mode == 'squares':
+            for x in gas_data:
+                lat_c, lon_c, ppm = x
+                if ppm == -999.0:
+                    continue
+
+                try:
+                    norm = (ppm - min_ppm) / (max_ppm - min_ppm)
+                    norm = max(0.0, min(1.0, norm))
+                except ZeroDivisionError:
+                    norm = ppm
+
+
+                color = get_color(norm, square_gradient)
+                bounds = [
+                    [lat_c - 0.5, lon_c - 0.5],
+                    [lat_c + 0.5, lon_c + 0.5]
+                ]
+                folium.Rectangle(
+                    bounds=bounds,
+                    color=color,
+                    fill=True,
+                    weight=2,
+                    fill_color=color,
+                    fill_opacity=0.5,
+                    popup=f"{ppm}"
+                ).add_to(m)
+
+
         
         step = (max_ppm - min_ppm) / 7
         sc=min_ppm
@@ -77,8 +131,8 @@ def generate_map(lat,long,radius,gas_data):
             position: absolute;
             top: 10px;
             right: 10px;
-            width: 220px;
-            height: 100px;
+            width: 240px;
+            height: fit-content;
             background-color: white;
             border: 2px solid grey;
             z-index:9999;
@@ -87,7 +141,7 @@ def generate_map(lat,long,radius,gas_data):
             text-align: center;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
         ">
-            <b>Gas Concentration Levels (ppm)</b><br>
+            <b>{scale_title}</b><br>
             <div style="
                 width: 100%;
                 height: 20px;

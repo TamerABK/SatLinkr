@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS OCO2 (
+    observationTime INTEGER,
     latitude REAL,
     longitude REAL,
-    observationTime INTEGER,
     solar_zenith_angle REAL,
     sensor_zenith_angle REAL,
     xco2_quality_flag INTEGER CHECK (xco2_quality_flag >= 0),
@@ -82,5 +82,31 @@ CREATE TABLE IF NOT EXISTS fetched_regions (
     created_at INTEGER DEFAULT (strftime('%s', 'now')),
     UNIQUE(latitude, longitude, radius_km,satellite),
     UNIQUE(region_name)
+);
+
+CREATE TABLE IF NOT EXISTS MODIS_DEEP_BLUE (
+  observationTime INTEGER,
+  latitude REAL,
+  longitude REAL,
+  Aerosol_Optical_Thickness_Land_Count_550 INTEGER,
+  Aerosol_Optical_Thickness_Land_Maximum_550 REAL,
+  Aerosol_Optical_Thickness_Land_Mean_550 REAL,
+  Aerosol_Optical_Thickness_Land_Minimum_550 REAL,
+  Aerosol_Optical_Thickness_Land_Standard_Deviation_550 REAL,
+  Angstrom_Exponent_Land_Maximum REAL,
+  Angstrom_Exponent_Land_Mean REAL,
+  Angstrom_Exponent_Land_Minimum REAL,
+  Angstrom_Exponent_Land_Standard_Deviation REAL,
+  Spectral_Aerosol_Optical_Thickness_Land_Count_412 INTEGER,
+  Spectral_Aerosol_Optical_Thickness_Land_Mean_412 REAL,
+  Spectral_Aerosol_Optical_Thickness_Land_Standard_Deviation_412 REAL,
+  Spectral_Aerosol_Optical_Thickness_Land_Count_488 INTEGER,
+  Spectral_Aerosol_Optical_Thickness_Land_Mean_488 REAL,
+  Spectral_Aerosol_Optical_Thickness_Land_Standard_Deviation_488 REAL,
+  Spectral_Aerosol_Optical_Thickness_Land_Count_670 INTEGER,
+  Spectral_Aerosol_Optical_Thickness_Land_Mean_670 REAL,
+  Spectral_Aerosol_Optical_Thickness_Land_Standard_Deviation_670 REAL,
+  UNIQUE(observationTime,latitude,longitude)
+
 );
 

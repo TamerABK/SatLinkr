@@ -19,7 +19,8 @@ async function fetchRegions() {
         card.className = 'region-card';
         card.innerHTML = `
             <h3>${region.name}</h3>
-            <p><strong>Satellite:</strong> ${region.satellite}  <strong>Radius:</strong> ${region.radius} km</p>
+            <p><strong>Satellite:</strong> ${region.satellite}</p>
+            <p><strong>Radius:</strong> ${region.radius} km</p>
             <p><strong>Lat:</strong> ${region.lat}  <strong>Lon:</strong> ${region.lon}</p>
             <div class="calendar">
                 ${region.available_dates.map(date => `<span class="date-cell">${date}</span>`).join('')}

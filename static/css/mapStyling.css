@@ -182,7 +182,16 @@ button:hover {
 }
 
 
+#download_buttons {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
 
+#download_buttons > button {
+    flex: 1;
+    cursor: pointer;
+}
 
 .calendar {
     width: 100%;
@@ -201,7 +210,7 @@ button:hover {
     padding: 4px 6px;
     font-size: 0.85rem;
     margin: 2px;  /* Space between cells */
-    flex: 1 1 30%; /* Ensure each date cell doesn't overflow */
+    flex: 0 0 33%; /* Ensure each date cell doesn't overflow */
     display: inline-block;
 }
 
@@ -213,6 +222,10 @@ button:hover {
     border-radius: 4px;
     padding: 15px;
     margin-bottom: 10px;
+}
+
+#customRegion {
+    padding: 5px !important;
 }
 
 #selectRegion > *, #customRegion >*, #new_region_div>*, #existing_region_div>*  {
