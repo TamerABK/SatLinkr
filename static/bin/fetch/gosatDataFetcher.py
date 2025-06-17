@@ -75,10 +75,30 @@ class gosatDataFetcher(object):
         try:
             self.connect()
             os.makedirs(os.path.dirname(local_path), exist_ok=True)
-            self.sftp.get(remote_path, local_path)
+
+            # Obtenir la taille du fichier
+            file_size = self.sftp.stat(remote_path).st_size
+            downloaded = 0
+
+            def download_progress(bytes_transferred, _):
+                nonlocal downloaded
+                downloaded = bytes_transferred  # Utiliser la valeur absolue au lieu d'accumuler
+                percentage = min(100, int((downloaded / file_size) * 100))
+                print(f"Téléchargement : {percentage}% ({downloaded:,}/{file_size:,} octets)")
+
+            print(f"Début du téléchargement de {os.path.basename(remote_path)}")
+            print(f"Taille totale : {file_size / 1024 / 1024:.2f} Mo")
+
+            self.sftp.get(remote_path, local_path, callback=download_progress)
+            print(f"Téléchargement terminé : {local_path}")
             return local_path
+
         except Exception as e:
-            print(f"Error downloading file: {e}")
+            print(f"Erreur lors du téléchargement : {e}")
+            return ""
+
+        except Exception as e:
+            print(f"Erreur lors du téléchargement : {e}")
             return ""
 
 
@@ -111,6 +131,7 @@ class gosatDataFetcher(object):
 
 
             os.makedirs(local_path, exist_ok=True)
+            print(" Downloading: "+ filename)
             return self.download_file(
                 f'{path}/{filename}',
                 os.path.join(local_path, filename)

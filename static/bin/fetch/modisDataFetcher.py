@@ -8,7 +8,6 @@ from datetime import datetime,timedelta
 def download_file_by_date(data_dict, target_date, token, path):
 
     dayOfYear= target_date - datetime(day=1,month=1,year=target_date.year) + timedelta(days=1)
-    print(f"A{target_date.year}{dayOfYear.days:03d}")
     for item in data_dict:
         if item == "query":
             continue

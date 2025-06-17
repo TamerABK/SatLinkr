@@ -98,5 +98,6 @@ class FetchHandler:
             print("Error inserting into fetched_regions:", e)
 
 
+
     def close(self):
         self.conn.close()
