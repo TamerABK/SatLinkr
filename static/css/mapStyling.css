@@ -26,6 +26,8 @@ body, html {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow-y: auto;
+    min-width: 250px;
 }
 
 .map-container {
@@ -152,7 +154,7 @@ button:hover {
     margin-top: 8%;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;  
+    flex-grow: 1;
 }
 
 .sidebar-toggle {

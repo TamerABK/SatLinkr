@@ -43,7 +43,7 @@ def matchURl(targetDate:datetime,linksFile="OCO2links.txt"):
     return None
 
 def handle_oco2_fetch(targetDate:datetime,basePath): 
-    linksFile = os.path.join(basePath,"OCO2links.txt")
+    linksFile = os.path.join(basePath,"OCO2.txt")
     url = matchURl( targetDate, linksFile ) 
 
     if not url:

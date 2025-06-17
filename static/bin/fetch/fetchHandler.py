@@ -96,7 +96,7 @@ class FetchHandler:
             self.conn.commit()
         except sqlite3.Error as e:
             print("Error inserting into fetched_regions:", e)
-            raise
+
 
     def close(self):
         self.conn.close()
