@@ -84,21 +84,21 @@ class gosatDataFetcher(object):
                 nonlocal downloaded
                 downloaded = bytes_transferred  # Utiliser la valeur absolue au lieu d'accumuler
                 percentage = min(100, int((downloaded / file_size) * 100))
-                print(f"Téléchargement : {percentage}% ({downloaded:,}/{file_size:,} octets)")
+                print(f"Downloaded : {percentage}% ({downloaded:,}/{file_size:,} bytes)")
 
-            print(f"Début du téléchargement de {os.path.basename(remote_path)}")
-            print(f"Taille totale : {file_size / 1024 / 1024:.2f} Mo")
+            print(f" Starting to download {os.path.basename(remote_path)}")
+            print(f"Total size : {file_size / 1024 / 1024:.2f} Mo")
 
             self.sftp.get(remote_path, local_path, callback=download_progress)
-            print(f"Téléchargement terminé : {local_path}")
+            print(f"Download done : {local_path}")
             return local_path
 
         except Exception as e:
-            print(f"Erreur lors du téléchargement : {e}")
+            print(f"Error while downloading : {e}")
             return ""
 
         except Exception as e:
-            print(f"Erreur lors du téléchargement : {e}")
+            print(f"Error while downloading : {e}")
             return ""
 
 

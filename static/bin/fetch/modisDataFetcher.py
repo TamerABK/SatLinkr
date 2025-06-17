@@ -6,13 +6,12 @@ from datetime import datetime,timedelta
 
 
 def download_file_by_date(data_dict, target_date, token, path):
-
-    dayOfYear= target_date - datetime(day=1,month=1,year=target_date.year) + timedelta(days=1)
+    dayOfYear = target_date - datetime(day=1, month=1, year=target_date.year) + timedelta(days=1)
     for item in data_dict:
         if item == "query":
             continue
         url = data_dict[item]["url"]
-        
+
         if f"A{target_date.year}{dayOfYear.days:03d}" in url:
             filename = url.split("/")[-1]
             headers = {
@@ -22,17 +21,22 @@ def download_file_by_date(data_dict, target_date, token, path):
             response = requests.get(url, headers=headers, stream=True)
             if response.status_code == 200:
                 filePath = os.path.join(path, filename)
+                total_size = int(response.headers.get('content-length', 0))
+                downloaded_size = 0
+                print(f"Total file size: {total_size} bytes")
                 with open(filePath, "wb") as f:
                     for chunk in response.iter_content(chunk_size=8192):
                         if chunk:
                             f.write(chunk)
+                            downloaded_size += len(chunk)
+                            progress = (downloaded_size / total_size) * 100
+                            print(f"Downloaded: {progress:.2f}% ({downloaded_size:,}/{total_size:,} bytes) ")
                 print(f"Downloaded {filename} successfully.")
                 return filePath
             else:
                 print(f"Failed to download file. Status code: {response.status_code}")
                 print(f"Response: {response.text[:200]}...")  # Show preview of the error
     return " "
-
 
 def read_token(config_path):
     config = configparser.ConfigParser()
