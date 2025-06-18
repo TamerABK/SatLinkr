@@ -100,8 +100,8 @@ def get_data(satellite, field, band, lat, long, radius, date, delta, satellite_c
         return query_oco2(os.getcwd(), date, delta, lat, long, radius, satellite_criteria), True
 
     elif satellite == "MODIS_DEEP_BLUE":
-        date = date.replace(hour=23, minute=59, second=0, microsecond=0)
-        return query_deepblue(os.getcwd(), field, band, date, 5, lat, long, radius), True
+        date = date.replace(hour=0, minute=1, second=0, microsecond=0)
+        return query_deepblue(os.getcwd(), field, band, date, 15, lat, long, radius), True
 
     return None
 
@@ -197,7 +197,7 @@ def launch_csv():
 
     date = None
     csvName = f'{satellite}_all.csv'
-    print(csvName)
+
     if not allDatesOption:
 
         try:

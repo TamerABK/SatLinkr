@@ -31,4 +31,6 @@ def query_deepblue(basePath,field,band,date:datetime,delta,lat,lon,radius):
     results = cursor.fetchall()
 
     conn.close()
+    print(params)
+    print(results)
     return results
