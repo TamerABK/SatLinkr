@@ -56,6 +56,11 @@
    ### MODIS
      The links for AERDB_D3_VIIRS_NOAA20 don't expire, but you have a limit about 2000 when getting them on the site, with them being quite slow.
       The resulting links have to be in a file named **DEEP.json**
+
+  - ### Step four: Updating Amazon CA certificates
+
+    In case the Amazon CA certificates expire, you can find them here : https://www.amazontrust.com/repository/
+    You just have to copy them to the **amazon.pem** file.
      
 
 ## Fetching data
