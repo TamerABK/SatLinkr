@@ -1,3 +1,5 @@
+import glob
+import shutil
 from threading import Timer
 from datetime import datetime
 import webbrowser
@@ -70,6 +72,21 @@ app.secret_key = os.urandom(24)
 socketio = SocketIO(app)
 
 
+def clean_tmp_directory():
+    tmp_path = os.path.join(os.getcwd(), 'tmp')
+    # Crée le dossier tmp s'il n'existe pas
+    os.makedirs(tmp_path, exist_ok=True)
+    # Supprime tous les fichiers dans tmp
+    files = glob.glob(os.path.join(tmp_path, '*'))
+    for f in files:
+        try:
+            if os.path.isfile(f):
+                os.unlink(f)
+            elif os.path.isdir(f):
+                shutil.rmtree(f)
+        except Exception as e:
+            print(f'Erreur lors de la suppression de {f}: {e}')
+
 def get_data(satellite, field, band, lat, long, radius, date, delta, satellite_criteria):
 
 
@@ -108,6 +125,7 @@ def handle_change_gas(data):
 
 @app.route('/render_map_png', methods=['POST'])
 def render_map_png():
+    clean_tmp_directory()
     return genPng()
 
 
@@ -164,8 +182,10 @@ def update_map():
 
 @app.route('/launch_csv', methods=['POST'])
 def launch_csv():
+    clean_tmp_directory()
     option = request.form.get('region_option')
     region = request.form.get('existing_region')
+    allDatesOption = request.form.get('allCsvDates')
 
     if option == "existing":
         satellite, latitude, longitude, radius = get_region(os.getcwd(), region)
@@ -175,15 +195,23 @@ def launch_csv():
         longitude = np.float64(request.form.get("longitude"))
         radius = int(request.form.get("radius"))
 
-    try:
-        date = datetime.strptime(request.form.get("datetime"), "%d/%m/%Y %H:%M")
-    except ValueError:
+    date = None
+    csvName = f'{satellite}_all.csv'
+    print(csvName)
+    if not allDatesOption:
+
         try:
-            date = datetime.strptime(request.form.get("datetime"), "%d/%m/%Y")
+            date = datetime.strptime(request.form.get("datetime"), "%d/%m/%Y %H:%M")
         except ValueError:
-            return jsonify({'error': "Invalid date format. Use 'dd/mm/yyyy' or 'dd/mm/yyyy HH:MM'."})
+            try:
+                date = datetime.strptime(request.form.get("datetime"), "%d/%m/%Y")
+            except ValueError:
+                return jsonify({'error': "Invalid date format. Use 'dd/mm/yyyy' or 'dd/mm/yyyy HH:MM'."})
+
+        csvName = f"{satellite}_{date.strftime('%Y-%m-%d_%H-%M')}.csv"
 
     delta_time = int(request.form.get("delta_time"))
+
     satellite_criteria = request.form.get("satellite_criteria")
 
     data, success = get_data(satellite, "*", 0, latitude, longitude, radius, date, delta_time, satellite_criteria)
@@ -197,7 +225,7 @@ def launch_csv():
 
 
 
-    return gen_csv(data, header, f"{satellite}_{date.strftime('%Y-%m-%d_%H-%M')}.csv")
+    return gen_csv(data, header,csvName)
 
 @app.route('/regions', methods=['GET'])
 def region_details():
@@ -288,5 +316,4 @@ def index():
 
 if __name__ == '__main__':
     Timer(3, lambda: webbrowser.open("http://127.0.0.1:5000")).start()
-
     socketio.run(app, debug=False)

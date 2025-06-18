@@ -1,7 +1,7 @@
 import csv
 import os
 
-from flask import send_file
+from flask import send_file, make_response
 from datetime import datetime
 
 def gen_csv(data, header, filename):
@@ -19,4 +19,6 @@ def gen_csv(data, header, filename):
             row[0] = datetime.fromtimestamp(row[0]).strftime('%Y-%m-%d %H:%M:%S')
             writer.writerow(row)
 
-    return send_file(csv_path, mimetype='text/csv')
+    response = make_response(send_file(csv_path, mimetype='text/csv'))
+    response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+    return response
