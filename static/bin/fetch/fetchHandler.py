@@ -84,6 +84,7 @@ class FetchHandler:
 
         # 5. Create new region entry
         try:
+            print("TRYING TO INSERT INTO fetched_regions")
             self.cursor.execute("""
                                 INSERT INTO fetched_regions (region_name, satellite, latitude, longitude, radius_km,
                                                              start_timestamp, end_timestamp, status, fetched_at,

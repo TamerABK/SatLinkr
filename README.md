@@ -88,5 +88,104 @@ you can download the map you have on screen as a png, or exctract the data you h
 
 Delta is the interval of time around your date-time input where points are looked for, this is for OCO2 and GOSAT, as the MODIS data and 1' zones for a whole day of measurments. 
 
+## Compiling into an exe
+
+To compile into an exe file, I recommend using *auto_py_to_exe* which requires *pyinstaller* as well as all the required modules to be installed in the python environment.
+
+- ### Step one: Wget
+
+Place the wget.exe corresponding to your system architecture in _static/bin_ 
+
+- ### Step two: Python Libraries
+
+ Download these requirements in your python environment, preferably a virtual env.
+ 
+      altgraph==0.17.4
+      attrs==25.3.0
+      auto-py-to-exe==2.46.0
+      bcrypt==4.3.0
+      bidict==0.23.1
+      blinker==1.9.0
+      bottle==0.13.3
+      bottle-websocket==0.2.9
+      branca==0.8.1
+      certifi==2025.1.31
+      cffi==1.17.1
+      cftime==1.6.4.post1
+      charset-normalizer==3.4.1
+      click==8.1.8
+      colorama==0.4.6
+      contourpy==1.3.2
+      cryptography==44.0.2
+      cycler==0.12.1
+      Eel==0.18.1
+      Flask==3.1.0
+      Flask-SocketIO==5.5.1
+      folium==0.19.5
+      fonttools==4.58.2
+      future==1.0.0
+      GDAL==3.8.4
+      gevent==25.5.1
+      gevent-websocket==0.10.1
+      greenlet==3.2.2
+      h11==0.14.0
+      h5py==3.13.0
+      haversine==2.9.0
+      idna==3.10
+      itsdangerous==2.2.0
+      Jinja2==3.1.6
+      kiwisolver==1.4.8
+      MarkupSafe==3.0.2
+      matplotlib==3.10.3
+      netCDF4==1.7.2
+      numpy==2.2.6
+      outcome==1.3.0.post0
+      packaging==25.0
+      paramiko==3.5.1
+      pefile==2023.2.7
+      pillow==11.2.1
+      pycparser==2.22
+      pyhdf==0.11.6
+      pyinstaller==6.14.1
+      pyinstaller-hooks-contrib==2025.4
+      PyNaCl==1.5.0
+      pyparsing==3.2.3
+      PySocks==1.7.1
+      python-dateutil==2.9.0.post0
+      python-engineio==4.12.0
+      python-socketio==5.13.0
+      pywin32-ctypes==0.2.3
+      requests==2.32.3
+      selenium==4.31.0
+      simple-websocket==1.1.0
+      six==1.17.0
+      sniffio==1.3.1
+      sortedcontainers==2.4.0
+      tqdm==4.67.1
+      trio==0.30.0
+      trio-websocket==0.12.2
+      typing_extensions==4.13.2
+      urllib3==2.4.0
+      websocket-client==1.8.0
+      Werkzeug==3.1.3
+      wsproto==1.2.0
+      xyzservices==2025.1.0
+      zope.event==5.0
+      zope.interface==7.2
+
+- ### Step three: Configuring the compilation
+
+  After finishing those 2 other steps, you have to configure *auto_py_to_exe* to compile the code into an exe file.
+
+    - **Script Location**: Select the main script of the project, which is `SatLinkr.py`.
+    - **One file**: Select this option to create a single exe file.
+    - **Console Window**: Keep it console based as most anti-viruses will block it if not.
+    - **Icon**: Add the .ico file from static folder
+    - **Additional Files**: Add the following folders:
+      - static
+      - templates
+    - **hidden imports**: Add the following hidden imports:
+      - `engineio.async_drivers.threading`
+    - **No upx**: Disabled
     
 

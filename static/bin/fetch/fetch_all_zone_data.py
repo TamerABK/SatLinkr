@@ -50,82 +50,126 @@ def find_file_by_date(path, file_type: str, date: datetime):
     return "",False
 
 
-def collect(satellite,lat,long,radius,start_date,end_date,basePath, localOnly, keepOption):
+def collect(satellite, lat, long, radius, start_date, end_date, basePath, localOnly, keepOption):
+    date = start_date
+    nbData = 0
 
+    if satellite == "OCO2":
+        try:
+            Dbcontroller = OCO2Inserter(os.path.join(basePath, "satelliteData.db"))
+        except Exception as e:
+            print(f"Erreur lors de l'initialisation du contrôleur OCO2 : {e}")
+            return nbData
 
-    date=start_date
-    nbData=0
+        while date <= end_date:
+            try:
+                localDataPath = os.path.join(basePath, "data", "OCO2", str(date.year))
+                os.makedirs(localDataPath, exist_ok=True)
+                file, foundLocally = find_file_by_date(localDataPath, "OCO2", date)
 
-    if satellite=="OCO2":
-        Dbcontroller= OCO2Inserter(os.path.join(basePath,"satelliteData.db"))
-        while (date<=end_date):
+                if file == "" and not localOnly:
+                    try:
+                        file = handle_oco2_fetch(date, basePath)
+                    except Exception as e:
+                        print(f"Erreur lors du téléchargement OCO2 pour {date} : {e}")
+                        file = ""
 
-            localDataPath= os.path.join(basePath,"data","OCO2",str(date.year))
-            os.makedirs(localDataPath,exist_ok=True)
-            file,foundLocally = find_file_by_date(localDataPath,"OCO2",date)
+                if file != "":
+                    try:
+                        data = Dbcontroller.process_file(lat, long, radius, file)
+                        nbData += len(data)
+                        Dbcontroller.insert_data(data)
+                    except Exception as e:
+                        print(f"Erreur lors du traitement/insertion OCO2 pour {file} : {e}")
 
-            if file == "" and not localOnly:
-                file=handle_oco2_fetch(date,basePath)
+                    if not keepOption and not localOnly and not foundLocally:
+                        try:
+                            os.remove(file)
+                        except Exception as e:
+                            print(f"Erreur lors de la suppression du fichier {file} : {e}")
 
-            if file != "":
-                data=Dbcontroller.process_file(lat,long,radius,file)
-                nbData+=len(data)
-                Dbcontroller.insert_data(data)
-
-                if not keepOption and not localOnly and not foundLocally:
-                    os.remove(file)
-
-            date=date+timedelta(days=1)
-
-    elif satellite=="GOSAT":
-
-        Dbcontroller = GOSATInserter(os.path.join(basePath,"satelliteData.db"))
-        Fetcher=  gosatDataFetcher(basePath)
-        localDataPath= os.path.join(basePath,"data","GOSAT","SWPR")
-        os.makedirs(localDataPath, exist_ok=True)
-
-
-        while (date<=end_date):
-
-            file,foundLocally= find_file_by_date(localDataPath,"GOSAT",date)
-
-            if file == "" and not localOnly:
-                file=Fetcher.handle_gosat_fetch("SWPR",date)
-
-            if file != "":
-                data=Dbcontroller.process_file(lat,long,radius,file)
-                nbData += len(data)
-                Dbcontroller.insert_data(data)
-
-                if not keepOption and not localOnly and not foundLocally:
-                    os.remove(file)
-
-            date=date+timedelta(days=1)
-
-    elif satellite=="MODIS_DEEP_BLUE":
-
-        Dbcontroller = DeepBlueInserter(os.path.join(basePath,"satelliteData.db"))
-        localDataPath= os.path.join(basePath,"data","MODIS","MODIS_DEEP_BLUE")
-        os.makedirs(localDataPath,exist_ok=True)
-
-        while (date<=end_date):
-
-            file,foundLocally = find_file_by_date(localDataPath,"MODIS_DEEP_BLUE",date)
-
-
-            if file == "" and not localOnly:
-                file = handle_modis_fetch("MODIS_DEEP_BLUE",date,basePath)
-
-
-            if file != "":
-                data=Dbcontroller.process_file(lat,long,radius,date,file)
-                nbData += len(data)
-                Dbcontroller.insert_data(data)
-
-                if not keepOption and not localOnly and not foundLocally:
-                    os.remove(file)
+            except Exception as e:
+                print(f"Erreur générale OCO2 pour la date {date} : {e}")
 
             date = date + timedelta(days=1)
 
+    elif satellite == "GOSAT":
+        try:
+            Dbcontroller = GOSATInserter(os.path.join(basePath, "satelliteData.db"))
+            Fetcher = gosatDataFetcher(basePath)
+            localDataPath = os.path.join(basePath, "data", "GOSAT", "SWPR")
+            os.makedirs(localDataPath, exist_ok=True)
+        except Exception as e:
+            print(f"Erreur lors de l'initialisation du contrôleur/fetcher GOSAT : {e}")
+            return nbData
+
+        while date <= end_date:
+            try:
+                file, foundLocally = find_file_by_date(localDataPath, "GOSAT", date)
+
+                if file == "" and not localOnly:
+                    try:
+                        file = Fetcher.handle_gosat_fetch("SWPR", date)
+                    except Exception as e:
+                        print(f"Erreur lors du téléchargement GOSAT pour {date} : {e}")
+                        file = ""
+
+                if file != "":
+                    try:
+                        data = Dbcontroller.process_file(lat, long, radius, file)
+                        nbData += len(data)
+                        Dbcontroller.insert_data(data)
+                    except Exception as e:
+                        print(f"Erreur lors du traitement/insertion GOSAT pour {file} : {e}")
+
+                    if not keepOption and not localOnly and not foundLocally:
+                        try:
+                            os.remove(file)
+                        except Exception as e:
+                            print(f"Erreur lors de la suppression du fichier {file} : {e}")
+
+            except Exception as e:
+                print(f"Erreur générale GOSAT pour la date {date} : {e}")
+
+            date = date + timedelta(days=1)
+
+    elif satellite == "MODIS_DEEP_BLUE":
+        try:
+            Dbcontroller = DeepBlueInserter(os.path.join(basePath, "satelliteData.db"))
+            localDataPath = os.path.join(basePath, "data", "MODIS", "MODIS_DEEP_BLUE")
+            os.makedirs(localDataPath, exist_ok=True)
+        except Exception as e:
+            print(f"Erreur lors de l'initialisation du contrôleur DeepBlue : {e}")
+            return nbData
+
+        while date <= end_date:
+            try:
+                file, foundLocally = find_file_by_date(localDataPath, "MODIS_DEEP_BLUE", date)
+
+                if file == "" and not localOnly:
+                    try:
+                        file = handle_modis_fetch("MODIS_DEEP_BLUE", date, basePath)
+                    except Exception as e:
+                        print(f"Erreur lors du téléchargement MODIS pour {date} : {e}")
+                        file = ""
+
+                if file != "":
+                    try:
+                        data = Dbcontroller.process_file(lat, long, radius, date, file)
+                        nbData += len(data)
+                        Dbcontroller.insert_data(data)
+                    except Exception as e:
+                        print(f"Erreur lors du traitement/insertion MODIS pour {file} : {e}")
+
+                    if not keepOption and not localOnly and not foundLocally:
+                        try:
+                            os.remove(file)
+                        except Exception as e:
+                            print(f"Erreur lors de la suppression du fichier {file} : {e}")
+
+            except Exception as e:
+                print(f"Erreur générale MODIS pour la date {date} : {e}")
+
+            date = date + timedelta(days=1)
 
     return nbData

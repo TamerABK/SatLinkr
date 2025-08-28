@@ -1,17 +1,15 @@
 import glob
 import shutil
 from threading import Timer
-from datetime import datetime
 import webbrowser
-from flask import Flask, jsonify, render_template, request, flash
-import os, uuid
+from flask import Flask, jsonify, render_template, request
 import sys
 import numpy as np
 from flask_socketio import SocketIO, emit
 
-from genCSV import gen_csv
-from genMap import generate_map
-from genPng import genPng
+from static.bin.gen.genCSV import gen_csv
+from static.bin.gen.genMap import generate_map
+from static.bin.gen.genPng import genPng
 from static.bin.db.GOSATInserter import GOSATInserter
 from static.bin.db.OCO2Inserter import OCO2Inserter
 from static.bin.fetch.fetchHandler import FetchHandler
@@ -171,10 +169,10 @@ def update_map():
         scale_title += " <br>MODIS Deep Blue"
     elif satellite == "GOSAT":
         mode = 'heatmap'
-        scale_title = "Concentration " + gas.strip('_') + " (" + band + " nm) <br>" + "GOSAT SWPR"
+        scale_title = "Concentration " + gas.strip('_') + " " + band + " nm (ppm) <br>" + "GOSAT SWPR"
     elif satellite == "OCO2":
         mode = 'heatmap'
-        scale_title = " Concentration CO2 <br> OCO2"
+        scale_title = " Concentration CO2 (ppm) <br> OCO2"
 
     map_html = generate_map(latitude, longitude, radius, data, scale_title, mode)
     return jsonify({'map_html': map_html})
@@ -219,7 +217,7 @@ def launch_csv():
 
     if not data:
         if success:
-            return jsonify({'error': "No data found within those parameters"})
+            return jsonify({'error': "No valid data found within those parameters"})
         else:
             return jsonify({'error': "No file found for this date locally or on the servers"})
 
@@ -307,7 +305,7 @@ def index():
     data, success = get_data(satellite, gas, band, latitude, longitude, radius, date, delta_time, satellite_criteria)
 
     map_html = generate_map(latitude, longitude, radius, data, "", "")
-    return render_template('mapTemplate.html', map_html=map_html, selected_gas=gas, selected_band=band,
+    return render_template('UItemplate.html', map_html=map_html, selected_gas=gas, selected_band=band,
                            satellite=satellite, latitude=latitude, longitude=longitude,
                            radius=radius, datetime=date.strftime("%d/%m/%Y %H:%M"),
                            delta_time=delta_time, satellite_criteria=satellite_criteria,
