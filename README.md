@@ -189,3 +189,5 @@ Place the wget.exe corresponding to your system architecture in _static/bin_
     - **No upx**: Disabled
     
 
+Credits: 
+Icon designer : linkedin.com/in/marwa-chazbek-267404261
