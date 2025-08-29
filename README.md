@@ -190,4 +190,5 @@ Place the wget.exe corresponding to your system architecture in _static/bin_
     
 
 Credits: 
-Icon designer : linkedin.com/in/marwa-chazbek-267404261
+Icon designer : https://linkedin.com/in/marwa-chazbek-267404261 
+
