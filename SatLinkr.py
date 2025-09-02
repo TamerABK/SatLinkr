@@ -314,4 +314,4 @@ def index():
 
 if __name__ == '__main__':
     Timer(3, lambda: webbrowser.open("http://127.0.0.1:5000")).start()
-    socketio.run(app, debug=False)
+    socketio.run(app, debug=False,allow_unsafe_werkzeug=True)
