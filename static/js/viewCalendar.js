@@ -19,19 +19,20 @@ async function fetchRegions() {
         card.className = 'region-card';
         card.innerHTML = `
             <h3>${region.name}</h3>
-            <p><strong>Satellite:</strong> ${region.satellite}</p>
+            <p><strong>Source:</strong> ${region.satellite}</p>
             <p><strong>Radius:</strong> ${region.radius} km</p>
-            <p><strong>Lat:</strong> ${region.lat}  <strong>Lon:</strong> ${region.lon}</p>
+            <p><strong>Lat:</strong> ${(region.lat).toFixed(4)}  <strong>Lon:</strong> ${(region.lon).toFixed(4)}</p>
             <div class="calendar">
                 ${region.available_dates.map(date => `<span class="date-cell">${date}</span>`).join('')}
             </div>
         `;
-
-        const op = document.createElement('option')
-        op.innerHTML = `<option value="${region.name}"> ${region.name}</option>`
-        selectList.forEach(selectElement => {
-          selectElement.appendChild(op.cloneNode(true));
-        });
+        if (region.satellite !== "TCCON") {
+            const op = document.createElement('option')
+            op.innerHTML = `<option value="${region.name}"> ${region.name}</option>`
+            selectList.forEach(selectElement => {
+                selectElement.appendChild(op.cloneNode(true));
+            });
+        }
 
         container.appendChild(card);
     }

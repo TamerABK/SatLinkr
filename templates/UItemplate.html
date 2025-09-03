@@ -42,6 +42,7 @@
             <div class="sidebar-toggle">
                 <button id="toggle1" class="toggle-btn active" onclick="showSidebar(1)">Map Params</button>
                 <button id="toggle2" class="toggle-btn" onclick="showSidebar(2)">Fetch Data</button>
+                <button id="toggle3" class="toggle-btn" onclick="showSidebar(3)">TCCON</button>
             </div>
 
             <div class="card-container">
@@ -116,6 +117,8 @@
                             <option value="False" {% if satellite_criteria == "False" %}selected{% endif %}>False</option>
                         </select><br>
                     </div>
+
+                    <label for="showTCCON"> <input type="checkbox" id="showTCCON" name="showTCCON"> Show TCCON Data</label>
 
                     <label for="allCsvDates"> <input type="checkbox" id="allCsvDates" name="allCsvDates"> All dates for csv</label>
 
@@ -193,6 +196,24 @@
 
 
         </div>
+
+        <div id="tcconBar" style="display: none;">
+            <h1>TCCON</h1>
+
+            <form id="tcconUploadForm" method="POST" enctype="multipart/form-data">
+
+                <label for="station_name">Station Name</label>
+                <input type="text" id="station_name" name="station_name"><br>
+
+                <label for="tcconFile">Import TCCON data (.nc):</label>
+                <input type="file" id="tcconFile" name="tcconFile[]" accept=".nc" multiple required>
+                <button type="submit">Upload</button>
+            </form>
+
+
+        </div>
+
+
     </div>
 
 
@@ -210,5 +231,6 @@
     <script src="{{ url_for('static', filename='js/viewCalendar.js') }}"></script>
     <script src="{{ url_for('static', filename='js/fetchFormControl.js') }}"></script>
     <script src="{{ url_for('static', filename='js/fetchRequest.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tcconUpload.js') }}"></script>
 </body>
 </html>

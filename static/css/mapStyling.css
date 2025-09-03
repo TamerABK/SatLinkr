@@ -149,7 +149,7 @@ button:hover {
 
 
 
-#mapBar, #fetchBar{
+#mapBar, #fetchBar, #tcconBar{
     height: 100%;
     margin-top: 8%;
     display: flex;

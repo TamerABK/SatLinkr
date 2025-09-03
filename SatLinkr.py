@@ -7,6 +7,8 @@ import sys
 import numpy as np
 from flask_socketio import SocketIO, emit
 
+from static.bin.db.TCCONInserter import TCCONInserter
+from static.bin.filter.filterTCCON import query_tccon
 from static.bin.gen.genCSV import gen_csv
 from static.bin.gen.genMap import generate_map
 from static.bin.gen.genPng import genPng
@@ -133,6 +135,7 @@ def update_map():
     region = request.form.get('existing_region')
     gas = request.form.get("gas")
     band = request.form.get("band")
+    tcconOption = request.form.get("showTCCON")
 
     if option == "existing":
         satellite, latitude, longitude, radius = get_region(os.getcwd(), region)
@@ -174,7 +177,12 @@ def update_map():
         mode = 'heatmap'
         scale_title = " Concentration CO2 (ppm) <br> OCO2"
 
-    map_html = generate_map(latitude, longitude, radius, data, scale_title, mode)
+    tccon_data = []
+    if tcconOption:
+        tccon_data=query_tccon(os.getcwd(),gas,date,delta_time,latitude,longitude,radius)
+        print(tccon_data)
+
+    map_html = generate_map(latitude, longitude, radius, data, scale_title,tccon_data, mode)
     return jsonify({'map_html': map_html})
 
 
@@ -224,6 +232,30 @@ def launch_csv():
 
 
     return gen_csv(data, header,csvName)
+
+@app.route('/upload_tccon', methods=['POST'])
+def upload_tccon():
+    file = request.files.get('tcconFile')
+    station = request.form.get('station_name')
+    inserter = TCCONInserter(os.path.join(os.getcwd(), 'satelliteData.db'))
+
+    if not file or not file.filename.endswith('.nc'):
+        return jsonify({'error': 'Fichier non valide'}), 400
+    filepath = os.path.join(os.getcwd(), 'tmp', file.filename)
+    file.save(filepath)
+    rows = inserter.process_file(filepath)
+    lat,long= rows[0][2],rows[0][3]
+
+    try:
+        inserter.insert_data(rows)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    inserter.add_station(station,lat,long)
+
+
+
+    return jsonify({'success': f'Fichier {file.filename} uploadé'})
 
 @app.route('/regions', methods=['GET'])
 def region_details():
@@ -303,7 +335,7 @@ def index():
     GOSATInserter(os.path.join(os.getcwd(), 'satelliteData.db'))
 
     data, success = get_data(satellite, gas, band, latitude, longitude, radius, date, delta_time, satellite_criteria)
-
+    clean_tmp_directory()
     map_html = generate_map(latitude, longitude, radius, data, "", "")
     return render_template('UItemplate.html', map_html=map_html, selected_gas=gas, selected_band=band,
                            satellite=satellite, latitude=latitude, longitude=longitude,

@@ -28,7 +28,7 @@ def get_color(value, gradient):
             return mcolors.to_hex(interp_rgb)
     return stops[-1][1]
 
-def generate_map(lat, long, radius, gas_data, scale_title, mode='heatmap'):
+def generate_map(lat, long, radius, gas_data, scale_title, station_data,mode='heatmap'):
     heat_gradient = {
         "0.0": "#0000FF",
         "0.2": "#00FF00",
@@ -62,6 +62,34 @@ def generate_map(lat, long, radius, gas_data, scale_title, mode='heatmap'):
         gas_data = [[float(x[0]), float(x[1]), float(x[2])] for x in gas_data]
         max_ppm = math.ceil(max([x[2] for x in gas_data]))
         min_ppm = math.floor(min([x[2] for x in gas_data]))
+
+        if station_data != []:
+
+
+            for station in station_data:
+                s_lat, s_lon, s_ppm = station
+                try:
+                    norm = (s_ppm - min_ppm) / (max_ppm - min_ppm)
+                    norm = max(0.0, min(1.0, norm))
+                except ZeroDivisionError:
+                    norm = s_ppm
+                color = get_color(norm, square_gradient)
+                bounds = [
+                    [s_lat - 0.0045, s_lon - 0.006],
+                    [s_lat + 0.0045, s_lon + 0.006]
+                ]
+                folium.Rectangle(
+                    bounds=bounds,
+                    color=color,
+                    fill=True,
+                    weight=2,
+                    fill_color=color,
+                    fill_opacity=0.5,
+                    popup=f"{s_ppm} ppm",
+                ).add_to(m)
+
+
+
 
 
 
