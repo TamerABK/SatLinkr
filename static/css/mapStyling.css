@@ -120,17 +120,30 @@ button:hover {
     padding: 10px;
 }
 
-
 #loader {
     display: none;
     position: absolute;
+    z-index: 998;
+    left: 40%;
+    top: 40%;
+    width: 20%;
+    height: 20%;
+    margin: -76px 0 0 -76px;
+    border-radius: 5%;
+    background-color:  #f4f4f4;
+    place-items: center;
+}
+#loader > * {
+    margin: 5%;
+}
+
+#spiner {
+    position: relative;
     z-index: 999;
-    border: 16px solid #f4f4f4;
-    left: 50%;
-    top: 50%;
+    border: 16px solid rgba(0,123,255,0.1);
     width: 50px;
     height: 50px;
-    margin: -76px 0 0 -76px;
+    margin-bottom: 20%;
     border-radius: 50%;
     border-top: 16px solid  #0056b3;
     -webkit-animation: spin 2s linear infinite;
@@ -149,7 +162,7 @@ button:hover {
 
 
 
-#mapBar, #fetchBar{
+#mapBar, #fetchBar, #tcconBar{
     height: 100%;
     margin-top: 8%;
     display: flex;

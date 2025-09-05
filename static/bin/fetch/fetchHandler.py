@@ -2,7 +2,7 @@ import os
 import sqlite3
 import time
 from datetime import datetime
-
+from flask_socketio import SocketIO
 from static.bin.fetch.fetch_all_zone_data import collect
 
 class FetchHandler:
@@ -51,7 +51,7 @@ class FetchHandler:
         """, (region_name,))
         return self.cursor.fetchone()
 
-    def register_fetch(self, region_name, satellite, lat, lon, radius_km, start_date:datetime, end_date:datetime, localOnly, keepOption):
+    def register_fetch(self, region_name, satellite, lat, lon, radius_km, start_date:datetime, end_date:datetime, localOnly, keepOption, socketio : SocketIO ):
 
         start_ts, end_ts = start_date.timestamp(), end_date.timestamp()
 
@@ -75,7 +75,7 @@ class FetchHandler:
         now_ts = int(time.time())
 
         print(f"About to fetch region '{region_name}'")
-        nbData = collect(satellite, lat, lon, radius_km, start_date, end_date, self.basePath,localOnly, keepOption)
+        nbData = collect(satellite, lat, lon, radius_km, start_date, end_date, self.basePath,localOnly, keepOption, socketio)
 
         if nbData == 0:
             fetchStatus = "No data available"

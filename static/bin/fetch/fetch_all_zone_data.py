@@ -1,5 +1,7 @@
 from datetime import timedelta
 
+from flask_socketio import SocketIO, emit
+
 from static.bin.db.DeepBlueInserter import DeepBlueInserter
 from static.bin.db.GOSATInserter import GOSATInserter
 from static.bin.db.OCO2Inserter import OCO2Inserter
@@ -50,7 +52,7 @@ def find_file_by_date(path, file_type: str, date: datetime):
     return "",False
 
 
-def collect(satellite, lat, long, radius, start_date, end_date, basePath, localOnly, keepOption):
+def collect(satellite, lat, long, radius, start_date, end_date, basePath, localOnly, keepOption, socketio: SocketIO):
     date = start_date
     nbData = 0
 
@@ -62,6 +64,13 @@ def collect(satellite, lat, long, radius, start_date, end_date, basePath, localO
             return nbData
 
         while date <= end_date:
+
+            try:
+                socketio.emit('fetch_progress',
+                          {'current': (date - start_date).days + 1, 'total': (end_date - start_date).days + 1})
+            except Exception as e:
+                print(f"Erreur lors de l'émission du progrès via SocketIO : {e}")
+
             try:
                 localDataPath = os.path.join(basePath, "data", "OCO2", str(date.year))
                 os.makedirs(localDataPath, exist_ok=True)
@@ -91,7 +100,9 @@ def collect(satellite, lat, long, radius, start_date, end_date, basePath, localO
             except Exception as e:
                 print(f"Erreur générale OCO2 pour la date {date} : {e}")
 
+
             date = date + timedelta(days=1)
+
 
     elif satellite == "GOSAT":
         try:
@@ -104,6 +115,13 @@ def collect(satellite, lat, long, radius, start_date, end_date, basePath, localO
             return nbData
 
         while date <= end_date:
+
+            try:
+                socketio.emit('fetch_progress',
+                          {'current': (date - start_date).days + 1, 'total': (end_date - start_date).days + 1})
+            except Exception as e:
+                print(f"Erreur lors de l'émission du progrès via SocketIO : {e}")
+
             try:
                 file, foundLocally = find_file_by_date(localDataPath, "GOSAT", date)
 
@@ -133,7 +151,11 @@ def collect(satellite, lat, long, radius, start_date, end_date, basePath, localO
 
             date = date + timedelta(days=1)
 
+
     elif satellite == "MODIS_DEEP_BLUE":
+
+
+
         try:
             Dbcontroller = DeepBlueInserter(os.path.join(basePath, "satelliteData.db"))
             localDataPath = os.path.join(basePath, "data", "MODIS", "MODIS_DEEP_BLUE")
@@ -143,6 +165,12 @@ def collect(satellite, lat, long, radius, start_date, end_date, basePath, localO
             return nbData
 
         while date <= end_date:
+            try:
+                socketio.emit('fetch_progress',
+                          {'current': (date - start_date).days + 1, 'total': (end_date - start_date).days + 1})
+            except Exception as e:
+                print(f"Erreur lors de l'émission du progrès via SocketIO : {e}")
+
             try:
                 file, foundLocally = find_file_by_date(localDataPath, "MODIS_DEEP_BLUE", date)
 
@@ -171,5 +199,7 @@ def collect(satellite, lat, long, radius, start_date, end_date, basePath, localO
                 print(f"Erreur générale MODIS pour la date {date} : {e}")
 
             date = date + timedelta(days=1)
+            socketio.emit('fetch_progress',
+                          {'current': (date - start_date).days + 1, 'total': (end_date - start_date).days + 1})
 
     return nbData
