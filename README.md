@@ -88,6 +88,14 @@ you can download the map you have on screen as a png, or exctract the data you h
 
 Delta is the interval of time around your date-time input where points are looked for, this is for OCO2 and GOSAT, as the MODIS data and 1' zones for a whole day of measurments. 
 
+Show TCCON data will display the mean concentration measured by the stations in the area you selected if you have previously uploaded such data, it displays only the data within the area and time selected.
+
+## Uploading TCCON DATA
+
+In the **TCCON** tab, you can select the netcdf files you want to upload, and put the station name that will be displayed to show available dates.
+Do not upload files from different stations at one time.
+
+
 ## Compiling into an exe
 
 To compile into an exe file, I recommend using *auto_py_to_exe* which requires *pyinstaller* as well as all the required modules to be installed in the python environment.

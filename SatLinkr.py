@@ -293,7 +293,7 @@ def fetch_data():
 
         try:
             handler.register_fetch(region_name, satellite, lat, long, radius, date_start, date_end, localOnly,
-                                   keepOption)
+                                   keepOption, socketio)
         except Exception as e:
             handler.close()
             return jsonify({'error': str(e)})
@@ -308,7 +308,7 @@ def fetch_data():
 
         try:
             handler.register_fetch(region_name, satellite, lat, long, radius, date_start, date_end, localOnly,
-                                   keepOption)
+                                   keepOption, socketio)
         except Exception as e:
             handler.close()
             return jsonify({'error': str(e)})

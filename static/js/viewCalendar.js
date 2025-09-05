@@ -1,6 +1,10 @@
 
 
 async function fetchRegions() {
+    const loader = document.getElementById('loader');
+    loader.style.display = 'grid';
+    document.getElementById('loading-text').textContent = `Loading Region Details...`;
+
     const response = await fetch('/regions', {method: 'GET'});
     const regions = await response.json();
 
@@ -49,6 +53,8 @@ async function fetchRegions() {
         dots:true,
         infinite:true
     });
+    loader.style.display = 'None';
+    document.getElementById('loading-text').textContent = ``;
 }
 
 // Load views when page loads

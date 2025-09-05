@@ -1,6 +1,7 @@
 document.getElementById("mapParams").addEventListener("submit", function(event) {
     const loader = document.getElementById('loader');
-    loader.style.display='block';
+    loader.style.display='grid';
+    document.getElementById('loading-text').textContent = ``;
     event.preventDefault(); // prevent full page reload
 
     const formData = new FormData(this);
@@ -22,6 +23,7 @@ document.getElementById("mapParams").addEventListener("submit", function(event) 
         console.error("Error:", error);
     }).finally(() => {
         attachMapListener();
+
         loader.style.display = 'none';
     });
 });

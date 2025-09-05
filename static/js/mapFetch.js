@@ -74,8 +74,8 @@ function shiftMapNorthByPercent(map, prc) {
 
 function sendMapHTML(){
     const loader = document.getElementById('loader');
-    loader.style.display='block';
-
+    loader.style.display='grid';
+    document.getElementById('loading-text').textContent = `Generating image...`;
     
         const center= shiftMapNorthByPercent(window.map,0);
         const zoom= window.map.getZoom();
@@ -116,6 +116,7 @@ function sendMapHTML(){
             alert("Something went wrong while generating the image.");
         })
         .finally(() => {
+            document.getElementById('loading-text').textContent = ``;
             loader.style.display = 'none';
         });
     

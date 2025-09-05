@@ -1,6 +1,7 @@
 function sendCSV(){
     const loader = document.getElementById('loader');
-    loader.style.display = 'block';
+    loader.style.display = 'grid';
+    document.getElementById('loading-text').textContent = `Exporting to csv...`;
 
     event.preventDefault();
 
